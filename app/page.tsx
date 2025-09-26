@@ -4,6 +4,31 @@ import Navbar from "@/components/Navbar";
 import TextPressure from "@/components/TextPressure";
 import ParticlesHeader from "@/components/ParticlesHeader";
 import TextType from "@/components/TextType";
+import ChromaGrid from "@/components/ProjectCards";
+import ScrollFloat from '@/components/ScrollFloat';
+import BuildsSection from "@/components/BuildsSection";
+
+
+const projects = [
+  {
+      id: "p1",
+      title: "Landing Clean UI",
+      tag: "Next.js / Tailwind",
+      cover: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=1600&auto=format&fit=crop",
+    },
+    {
+      id: "p2",
+      title: "Realtime Chat",
+      tag: "Socket.io / Node",
+      cover: "https://images.unsplash.com/photo-1523477800337-966dbabe060b?q=80&w=1600&auto=format&fit=crop",
+    },
+    {
+      id: "p3",
+      title: "Commerce Headless",
+      tag: "Stripe / CMS",
+      cover: "https://images.unsplash.com/photo-1518779578993-ec3579fee39f?q=80&w=1600&auto=format&fit=crop",
+    },
+];
 
 export default function Home() {
   return (
@@ -57,7 +82,7 @@ export default function Home() {
       <p className="max-w-[600px] text-center text-[12px] sm:text-[13px] md:text-[18px] leading-relaxed text-[#212121]/80">
       <TextType
   text={`Hello World!👋 I’m Oddy Bagus, a passionate Web Developer focused on creating clean, efficient, and well-designed web applications.`}
-  className="font-semibold text-[#212121] align-middle"
+  className="font-light text-[#212121] align-middle"
   typeRange={[50, 50]}     // faster typing -> lower numbers
   deleteRange={[45, 25]}    // delete speed if you enable erase/loop
   pauseTyped={900}
@@ -73,7 +98,48 @@ export default function Home() {
     </div>
   </div>
 </div>
+{/* ===== “The Vierre Lab” section title + cards ===== */}
+      <section id="builds" className="px-4 sm:px-6">
+        <div className="mx-auto max-w-[1600px]">
+          {/* Title block */}
+<div className="py-10 md:py-14 text-center">
+  <ScrollFloat
+    animationDuration={1}
+    ease="back.inOut(3)"
+    scrollStart="center bottom+=50%"
+    scrollEnd="bottom bottom-=40%"
+    stagger={0.03}
+  >
+    The Vierre Lab
+  </ScrollFloat>
 
+  <p className="mt-2 text-sm sm:text-base text-[#212121]/70 max-w-2xl mx-auto">
+    “Build, broken, rebuilt” here are some of my projects.
+  </p>
+</div>
+          {/* Cards (keep your interactive canvas) */}
+          
+          <BuildsSection projects={projects} />
+        </div>
+      </section>
+
+      <section id="stack">
+        <div className="py-10 md:py-14 text-center">
+  <ScrollFloat
+    animationDuration={1}
+    ease="back.inOut(3)"
+    scrollStart="center bottom+=50%"
+    scrollEnd="bottom bottom-=40%"
+    stagger={0.03}
+  >
+    What I Use
+  </ScrollFloat>
+
+  <p className="mt-2 text-sm sm:text-base text-[#212121]/70 max-w-2xl mx-auto">
+    Tools behind the work.
+  </p>
+</div>
+      </section>
     </main>
   );
 }
