@@ -10,14 +10,14 @@ import {
 import { Moon, Sun, X } from "lucide-react";
 
 /* -------------------- Config -------------------- */
-const NAV = ["BUILDS", "STACK", "STORY", "TALK"] as const;
+const NAV = ["BUILDS", "STACK", "STORY", "CONTACT"] as const;
 type NavLabel = (typeof NAV)[number];
 
 const SECTION_ID: Record<NavLabel, string> = {
   BUILDS: "builds",
   STACK: "stack",
   STORY: "story",
-  TALK: "talk",
+  CONTACT: "contact",
 };
 
 const CONTAINER = "max-w-[1600px] mx-auto px-4 sm:px-6";
@@ -142,7 +142,7 @@ export default function Navbar() {
     BUILDS: null,
     STACK: null,
     STORY: null,
-    TALK: null,
+    CONTACT: null,
   });
 
   const activeRef = useRef<NavLabel>(active);

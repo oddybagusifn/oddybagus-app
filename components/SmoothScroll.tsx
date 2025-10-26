@@ -11,7 +11,7 @@ export default function SmoothScroll() {
 
     const lenis = new Lenis({
       // “inertia/delay” rasa halus
-      duration: 1.25,                           // makin besar makin berasa delay
+      duration: 2,                           // makin besar makin berasa delay
       easing: (t: number) => 1 - Math.pow(1 - t, 3), // easeOutCubic
       // opsi yang masih ada di versi baru:
       // syncTouch: true,        // (opsional) sinkronkan momentum touch (biar tetap halus)

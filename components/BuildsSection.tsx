@@ -1,8 +1,11 @@
 // components/BuildsSection.tsx
 "use client";
 
-import React, { useMemo, useState } from "react";
-import { ArrowRight } from "lucide-react";
+import React, { useEffect, useRef } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
 
 type Project = {
   id: string;
@@ -17,243 +20,299 @@ interface BuildsSectionProps {
 }
 
 export default function BuildsSection({ projects }: BuildsSectionProps) {
-  const [active, setActive] = useState(0);
-  const popKey = useMemo(
-    () => `${projects[active]?.id}-${active}`,
-    [active, projects]
-  );
-  const safe = (i: number) =>
-    Math.min(Math.max(i, 0), Math.max(projects.length - 1, 0));
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Transisi unik: Curtain wipe + sheen (media), drift+skew (title)
+  useEffect(() => {
+    const root = containerRef.current;
+    if (!root) return;
+
+    const rows = gsap.utils.toArray<HTMLDivElement>(
+      root.querySelectorAll(".reveal-row")
+    );
+
+    const cleanups: Array<() => void> = [];
+
+    rows.forEach((row) => {
+      const mediaWrap = row.querySelector(".media-wrap") as HTMLElement | null;
+      const sheen = row.querySelector(".media-sheen") as HTMLElement | null;
+      const titleEl = row.querySelector(".piece-title") as HTMLElement | null;
+
+      // arah title masuk: dari sisi berlawanan gambar
+      const titleSide = row.dataset.titleSide === "right" ? 1 : -1; // 1 = dari kanan, -1 = dari kiri
+
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: row,
+          start: "top 78%",
+          end: "top 40%",
+          once: true, // tampil sekali (seperti di video). Jika ingin bolak-balik: hapus ini dan pakai toggleActions
+        },
+        defaults: { ease: "expo.out" },
+      });
+
+      // MEDIA: curtain wipe via clip-path + depth pop
+      if (mediaWrap) {
+        // set state awal (tertutup dari kanan atau kiri, tergantung sisi gambar)
+        const fromRight = row.dataset.imageSide === "right";
+        const fromClip = fromRight
+          ? "inset(0 0 0 100%)"
+          : "inset(0 100% 0 0)";
+
+        gsap.set(mediaWrap, {
+          clipPath: fromClip,
+          filter: "blur(6px)",
+          y: 22,
+          rotateZ: fromRight ? 1 : -1,
+          scale: 0.96,
+          transformPerspective: 1000,
+          transformOrigin: "center",
+          willChange: "clip-path, transform, filter, opacity",
+        });
+
+        tl.to(
+          mediaWrap,
+          {
+            clipPath: "inset(0 0% 0 0%)",
+            filter: "blur(0px)",
+            y: 0,
+            rotateZ: 0,
+            duration: 0.9,
+          },
+          0
+        )
+          .to(
+            mediaWrap,
+            { scale: 1.02, duration: 0.32, ease: "power2.out" },
+            0.0
+          )
+          .to(
+            mediaWrap,
+            { scale: 1, duration: 0.38, ease: "power2.out" },
+            ">-0.1"
+          );
+
+        // Sheen (kilau) melintas
+        if (sheen) {
+          gsap.set(sheen, {
+            xPercent: fromRight ? -130 : 130,
+            rotate: fromRight ? 12 : -12,
+            opacity: 0.0,
+          });
+          tl.to(
+            sheen,
+            {
+              xPercent: fromRight ? 135 : -135,
+              opacity: 0.18,
+              duration: 0.7,
+              ease: "power2.out",
+            },
+            0.08
+          ).to(
+            sheen,
+            { opacity: 0, duration: 0.25, ease: "power1.out" },
+            ">-0.12"
+          );
+        }
+      }
+
+      // TITLE: drift + skew + unblur dari sisi lawan gambar
+      if (titleEl) {
+        gsap.set(titleEl, {
+          opacity: 0,
+          x: 28 * titleSide,
+          y: 14,
+          skewX: 6 * titleSide,
+          filter: "blur(3px)",
+          willChange: "transform, opacity, filter",
+        });
+
+        tl.to(
+          titleEl,
+          {
+            opacity: 1,
+            x: 0,
+            y: 0,
+            skewX: 0,
+            filter: "blur(0px)",
+            duration: 0.9,
+          },
+          0.06
+        );
+      }
+
+      cleanups.push(() => {
+        tl.scrollTrigger?.kill();
+        tl.kill();
+      });
+    });
+
+    return () => {
+      cleanups.forEach((c) => c());
+      ScrollTrigger.refresh();
+    };
+  }, []);
 
   return (
     <section id="builds" className="px-4 sm:px-6">
-      <div className="mx-auto max-w-[1600px] py-10 lg:py-16 grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-        {/* Preview kiri */}
-        <div className="lg:col-span-6">
-          <div className="preview relative rounded-[28px] overflow-hidden bg-[#e6e6e6] aspect-[16/10] sm:aspect-[4/3]">
-            {projects.map((p, i) => {
-              const on = i === active;
-              return (
-                <img
-                  key={`${p.id}-${i}`}
-                  src={p.cover}
-                  alt={p.title}
-                  className={[
-                    "absolute inset-0 h-full w-full object-cover transition-all duration-600 ease-[cubic-bezier(.22,1,.36,1)]",
-                    on ? "opacity-100 scale-100 animate-img-pop" : "opacity-0 scale-[.975]",
-                  ].join(" ")}
-                />
-              );
-            })}
-            {/* bubble glow pop ketika aktif berganti */}
-            <span key={popKey} className="pointer-events-none absolute inset-0 animate-pop-bubble" />
-            <div className="pointer-events-none absolute bottom-4 left-4 right-4 flex justify-between text-xs sm:text-sm text-[#212121]/80">
-              <span className="font-medium">{projects[active]?.title}</span>
-              {projects[active]?.tag ? <span>{projects[active]?.tag}</span> : null}
-            </div>
-          </div>
-        </div>
-
-        {/* List kanan */}
-        <div className="lg:col-span-6">
-          <div className="mb-6 flex items-end justify-between">
-            <h3 className="text-[18px] sm:text-[20px] font-extrabold tracking-[.12em] text-[#212121]">
-              WORK
-            </h3>
-            <span className="text-[#212121]/50 text-sm">{projects.length}</span>
-          </div>
-
-          {/* NOTE: class "list" dipakai untuk atur gap kiri-kanan border */}
-          <ul className="list">
-            {projects.map((p, i) => {
-              const on = i === active;
-              return (
-                <li
-                  key={p.id}
-                  className={[
-                    "row group relative overflow-hidden",
-                    "transition-transform duration-450 ease-[cubic-bezier(.22,1,.36,1)]",
-                    on ? "row-active" : "",
-                  ].join(" ")}
-                  onMouseMove={(e) => {
-                    const t = e.currentTarget as HTMLLIElement;
-                    const r = t.getBoundingClientRect();
-                    t.style.setProperty(
-                      "--mx",
-                      `${((e.clientX - r.left) / r.width) * 100}%`
-                    );
-                    t.style.setProperty(
-                      "--my",
-                      `${((e.clientY - r.top) / r.height) * 100}%`
-                    );
-                  }}
-                >
-                  <button
-                    type="button"
-                    onMouseEnter={() => setActive(safe(i))}
-                    onFocus={() => setActive(safe(i))}
-                    onTouchStart={() => setActive(safe(i))}
-                    onClick={() => setActive(safe(i))}
-                    className="row-inner w-full flex items-center justify-between gap-4 py-5 px-4 sm:px-5 text-left"
-                  >
-                    <span className="flex items-center gap-3">
-                      <ArrowRight
-                        size={18}
-                        className={[
-                          "arrow shrink-0 transition-all duration-400 ease-[cubic-bezier(.22,1,.36,1)]",
-                          on ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-1",
-                        ].join(" ")}
-                      />
-                      <span
-                        className={[
-                          "title leading-none transition-colors duration-400 ease-[cubic-bezier(.22,1,.36,1)]",
-                          on ? "text-[color:var(--bg)]" : "text-[#212121]/85",
-                        ].join(" ")}
-                      >
-                        {p.title}
-                      </span>
-                    </span>
-
-                    <span
-                      className={[
-                        "tag text-xs sm:text-sm transition-colors duration-400 ease-[cubic-bezier(.22,1,.36,1)]",
-                        on ? "text-[color:var(--bg)]/75" : "text-[#212121]/55",
-                      ].join(" ")}
-                    >
-                      {p.tag ?? ""}
-                    </span>
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
+      <div ref={containerRef} className="mx-auto max-w-[1600px]">
+        <div className="h-2" />
+        {projects.map((p, i) => (
+          <BuildRow key={p.id} project={p} index={i} />
+        ))}
+        <div className="h-2" />
       </div>
 
-      {/* THEME + ANIMASI + BORDER INSET */}
+      {/* gaya kecil untuk sheen */}
       <style jsx>{`
-        :root { --ink: #212121; --bg: #e6e6e6; }
-
-        /* ====== LIST: border punya gap kiri-kanan ====== */
-        .list { --gapX: 14px; }
-        @media (min-width: 768px) { .list { --gapX: 18px; } }
-
-        .row {
-          background: transparent;
-          transform-origin: center;
-          will-change: background-color, transform, box-shadow;
-        }
-        /* garis atas baris pertama */
-        .row:first-child::before {
-          content: "";
+        .media-sheen {
           position: absolute;
-          left: var(--gapX);
-          right: var(--gapX);
-          top: 0;
-          height: 1px;
-          background: rgba(33, 33, 33, 0.2);
+          top: -10%;
+          bottom: -10%;
+          width: 35%;
           pointer-events: none;
+          background: linear-gradient(
+            90deg,
+            rgba(230, 230, 230, 0) 0%,
+            rgba(230, 230, 230, 0.6) 50%,
+            rgba(230, 230, 230, 0) 100%
+          );
+          filter: blur(4px);
+          mix-blend-mode: screen;
         }
-        /* garis bawah setiap baris */
-        .row::after {
-          content: "";
-          position: absolute;
-          left: var(--gapX);
-          right: var(--gapX);
-          bottom: 0;
-          height: 1px;
-          background: rgba(33, 33, 33, 0.2);
-          transition: background 380ms cubic-bezier(.22,1,.36,1);
-          pointer-events: none;
-        }
-
-        /* ====== HOVER/ACTIVE: bg #212121 + zoom + text ke #e6e6e6 ====== */
-        .row:hover,
-        .row:focus-within,
-        .row.row-active {
-          background: var(--ink);
-          transform: scale(1.015);
-          box-shadow: 0 12px 28px rgba(33, 33, 33, 0.18);
-        }
-        .row:hover::after,
-        .row:focus-within::after,
-        .row.row-active::after {
-          background: rgba(230, 230, 230, 0.18);
-        }
-
-        .arrow { color: #212121; }
-        .row:hover .arrow,
-        .row:focus-within .arrow,
-        .row.row-active .arrow {
-          color: var(--bg);
-          opacity: 1;
-          transform: translateX(0);
-        }
-        .row:hover .title,
-        .row:focus-within .title,
-        .row.row-active .title,
-        .row:hover .tag,
-        .row:focus-within .tag,
-        .row.row-active .tag {
-          color: var(--bg);
-        }
-
-        /* spotlight mengikuti kursor di atas bg gelap */
-        .row-inner { position: relative; z-index: 1; }
-        .row::marker { display: none; }
-        .row::selection { background: transparent; }
-        .row > .row-inner::after {
-          content: "";
-          position: absolute;
-          inset: 0;
-          background:
-            radial-gradient(
-              160px 160px at var(--mx, 50%) var(--my, 50%),
-              rgba(230,230,230,0.10),
-              transparent 60%
-            );
-          opacity: 0;
-          transform: scale(0.94);
-          transition:
-            opacity 380ms cubic-bezier(.22,1,.36,1),
-            transform 380ms cubic-bezier(.22,1,.36,1);
-          pointer-events: none;
-          z-index: -1;
-        }
-        .row:hover > .row-inner::after,
-        .row.row-active > .row-inner::after {
-          opacity: 1;
-          transform: scale(1);
-        }
-
-        /* preview glow + pop image (tetap) */
-        .preview::before {
-          content: "";
-          position: absolute;
-          inset: 0;
-          background: radial-gradient(60% 60% at 70% 30%, rgba(33,33,33,.06), transparent 60%);
-          opacity: 0.65;
-          filter: blur(28px);
-          pointer-events: none;
-        }
-        @keyframes img-pop {
-          0% { opacity: 0; transform: scale(0.965) translateY(6px); filter: drop-shadow(0 10px 20px rgba(33,33,33,.12)); }
-          60% { opacity: 1; transform: scale(1.02); filter: drop-shadow(0 24px 48px rgba(33,33,33,.16)); }
-          100% { opacity: 1; transform: scale(1); filter: drop-shadow(0 20px 40px rgba(33,33,33,.14)); }
-        }
-        .animate-img-pop { animation: img-pop 580ms cubic-bezier(.22,1,.36,1); }
-
-        @keyframes pop-bubble {
-          0% { opacity: 0; background:
-            radial-gradient(180px 180px at 60% 40%, rgba(33,33,33,.18), transparent 60%),
-            radial-gradient(220px 220px at 30% 70%, rgba(33,33,33,.10), transparent 60%); }
-          60% { opacity: .85; }
-          100% { opacity: 0; background:
-            radial-gradient(260px 260px at 60% 40%, rgba(33,33,33,.00), transparent 70%),
-            radial-gradient(320px 320px at 30% 70%, rgba(33,33,33,.00), transparent 70%); }
-        }
-        .animate-pop-bubble { animation: pop-bubble 680ms cubic-bezier(.22,1,.36,1); }
       `}</style>
     </section>
+  );
+}
+
+function BuildRow({ project, index }: { project: Project; index: number }) {
+  // selang-seling posisi (kiri-kanan) untuk gambar
+  const imageLeft = index % 2 === 0;
+
+  const boxStyle: React.CSSProperties = {
+    height: "clamp(150px, 34vw, 320px)",
+    minHeight: 150,
+  };
+
+  const TitleBlock = (
+    <div
+      className={[
+        "piece piece-title col-span-6",
+        imageLeft ? "order-2 pl-2 sm:pl-3 md:pl-6" : "order-1 pr-2 sm:pr-3 md:pr-6",
+        "flex items-center",
+      ].join(" ")}
+    >
+      <div className={imageLeft ? "text-left" : "text-right"}>
+        <h3
+          className={[
+            "leading-[0.9] font-extrabold text-[#212121] tracking-tight",
+            "text-[clamp(26px,7.8vw,70px)] md:text-[clamp(36px,6.2vw,92px)]",
+          ].join(" ")}
+          style={{ letterSpacing: "-0.01em" }}
+        >
+          {project.title}
+        </h3>
+
+        {/* TAGS → 2 pill (atau lebih) terpisah, rapat berdampingan */}
+        {(() => {
+          const tags = (project.tag ?? "")
+            .split("/")
+            .map((t) => t.trim())
+            .filter(Boolean);
+          if (!tags.length) return null;
+
+          return (
+            <div className={imageLeft ? "mt-2 text-left" : "mt-2 text-right"}>
+              <div className="inline-flex gap-2">
+                {tags.map((t, i) => (
+                  <span
+                    key={i}
+                    className={[
+                      "px-3 py-1 text-[13px] sm:text-[14px] font-semibold select-none",
+                      "border border-[#212121] text-[#212121] bg-transparent",
+                      "rounded-full",
+                      "transition-colors hover:bg-[#212121] hover:text-[#e6e6e6]",
+                    ].join(" ")}
+                  >
+                    {t}
+                  </span>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
+      </div>
+    </div>
+  );
+
+  const ImageCard = (
+    <a
+      href={project.href ?? "#"}
+      aria-label={project.title}
+      className={[
+        "piece piece-media group/card col-span-6",
+        imageLeft ? "order-1" : "order-2",
+        "mx-[2px] sm:mx-[4px]",
+        "block",
+      ].join(" ")}
+    >
+      <div
+        className={[
+          "media-wrap relative overflow-hidden w-full rounded-none bg-[#e6e6e6]",
+          "ring-1 ring-[#212121]/12 shadow-[0_6px_20px_rgba(33,33,33,0.06)]",
+          "transform-gpu transition-transform duration-[1200ms] ease-[cubic-bezier(.22,1,.36,1)]",
+          "group-hover/card:scale-[0.982] md:group-hover/card:scale-[0.985]",
+        ].join(" ")}
+        style={{ ...boxStyle, willChange: "transform" }}
+      >
+        {/* Sheen */}
+        <span className="media-sheen" />
+
+        {/* Gambar */}
+        <img
+          src={project.cover}
+          alt={project.title}
+          loading={index === 0 ? "eager" : "lazy"}
+          decoding="async"
+          crossOrigin="anonymous"
+          referrerPolicy="no-referrer"
+          className={[
+            "absolute inset-0 w-full h-full object-cover",
+            "grayscale contrast-110 saturate-0 opacity-[0.92]",
+            "transform-gpu transition-transform duration-[1200ms] ease-[cubic-bezier(.22,1,.36,1)]",
+            // hover: isi gambar zoom lebih dalam (ken burns mini)
+            "group-hover/card:scale-[1.14]",
+            "group-hover/card:grayscale-0 group-hover/card:saturate-100 group-hover/card:opacity-100",
+          ].join(" ")}
+          style={{ willChange: "transform" }}
+        />
+      </div>
+    </a>
+  );
+
+  return (
+    <div
+      className={[
+        "reveal-row",
+        "grid grid-cols-12 items-center",
+        "py-8 md:py-12",
+        "gap-x-2 sm:gap-x-3 md:gap-x-6",
+        "gap-y-6",
+      ].join(" ")}
+      data-title-side={imageLeft ? "right" : "left"}
+      data-image-side={imageLeft ? "left" : "right"}
+    >
+      {imageLeft ? (
+        <>
+          {ImageCard}
+          {TitleBlock}
+        </>
+      ) : (
+        <>
+          {TitleBlock}
+          {ImageCard}
+        </>
+      )}
+    </div>
   );
 }

@@ -4,9 +4,11 @@ import Navbar from "@/components/Navbar";
 import TextPressure from "@/components/TextPressure";
 import ParticlesHeader from "@/components/ParticlesHeader";
 import TextType from "@/components/TextType";
-import ChromaGrid from "@/components/ProjectCards";
 import ScrollFloat from '@/components/ScrollFloat';
 import BuildsSection from "@/components/BuildsSection";
+import StackSpotlightGrid from "@/components/StackSpotlightGrid";
+import MarqueeVierre from "@/components/MarqueeVierre";
+import RevealSwipeFM from "@/components/RevealSwipeFM";
 
 
 const projects = [
@@ -29,6 +31,18 @@ const projects = [
       cover: "https://images.unsplash.com/photo-1518779578993-ec3579fee39f?q=80&w=1600&auto=format&fit=crop",
     },
 ];
+
+const skills = [
+  "Laravel 11/12",
+  "MySQL",
+  "REST API",
+  "PHP",
+  "Git/GitHub",
+  "Web Design",
+  "Unity 2D",
+];
+
+const stack = skills.map((label) => ({ content: label }));
 
 export default function Home() {
   return (
@@ -61,8 +75,6 @@ export default function Home() {
   />
 </h1>
 
-
-
     <h2 className="text-[28px] md:text-[36px] font-extrabold tracking-[.08em]">
       LET’S BUILD SOMETHING{" "}
       <span className="text-transparent [-webkit-text-stroke:1px_#212121]">DIFFERENT</span>
@@ -73,17 +85,19 @@ export default function Home() {
 
       </header>
 
+
       {/* ===== CAPTION (di luar header → tidak kena partikel) ===== */}
       <div className="px-4 sm:px-6">
   <div className="mx-auto max-w-[1600px] py-6 sm:py-8">
     {/* wrapper konten: width = konten, center pakai mx-auto */}
     <div className="w-fit mx-auto flex items-center gap-2 sm:gap-3 md:gap-4">
       <span className="h-2 w-2 rounded-full bg-[#212121] flex-none" />
-      <p className="max-w-[600px] text-center text-[12px] sm:text-[13px] md:text-[18px] leading-relaxed text-[#212121]/80">
+      <p className="max-w-[600px] text-center text-[13px] sm:text-[15px] md:text-[20px] leading-relaxed text-[#212121]/80">
       <TextType
   text={`Hello World!👋 I’m Oddy Bagus, a passionate Web Developer focused on creating clean, efficient, and well-designed web applications.`}
   className="font-light text-[#212121] align-middle"
   typeRange={[50, 50]}     // faster typing -> lower numbers
+  
   deleteRange={[45, 25]}    // delete speed if you enable erase/loop
   pauseTyped={900}
   pauseDeleted={700}
@@ -98,11 +112,13 @@ export default function Home() {
     </div>
   </div>
 </div>
+
 {/* ===== “The Vierre Lab” section title + cards ===== */}
       <section id="builds" className="px-4 sm:px-6">
         <div className="mx-auto max-w-[1600px]">
           {/* Title block */}
 <div className="py-10 md:py-14 text-center">
+      <h1 className="text-[36px] md:text-[44px] font-extrabold tracking-[.08em]">
   <ScrollFloat
     animationDuration={1}
     ease="back.inOut(3)"
@@ -110,9 +126,9 @@ export default function Home() {
     scrollEnd="bottom bottom-=40%"
     stagger={0.03}
   >
-    The Vierre Lab
+    THE VIERRE LAB
   </ScrollFloat>
-
+</h1>
   <p className="mt-2 text-sm sm:text-base text-[#212121]/70 max-w-2xl mx-auto">
     “Build, broken, rebuilt” here are some of my projects.
   </p>
@@ -123,23 +139,41 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="stack">
-        <div className="py-10 md:py-14 text-center">
-  <ScrollFloat
-    animationDuration={1}
-    ease="back.inOut(3)"
-    scrollStart="center bottom+=50%"
-    scrollEnd="bottom bottom-=40%"
-    stagger={0.03}
-  >
-    What I Use
-  </ScrollFloat>
-
-  <p className="mt-2 text-sm sm:text-base text-[#212121]/70 max-w-2xl mx-auto">
-    Tools behind the work.
-  </p>
+      <div className="py-16">
+<RevealSwipeFM direction="up" delay={0.1} duration={0.5}>
+  <MarqueeVierre text="VIERRE." repeat={22} duration={24} gap="0rem" />
+</RevealSwipeFM>
 </div>
-      </section>
+
+      <section id="stack" className="px-4 sm:px-6 py-16">
+  <div className="mx-auto max-w-[1600px]">
+    <div className="text-center py-10 md:py-14">
+      <h1 className="text-[36px] md:text-[44px] font-extrabold tracking-[.08em]">
+        <ScrollFloat
+          animationDuration={1}
+          ease="back.inOut(3)"
+          scrollStart="center bottom+=50%"
+          scrollEnd="bottom bottom-=40%"
+          stagger={0.03}
+        >
+          WHAT I USE?
+        </ScrollFloat>
+      </h1>
+      <p className="mt-2 text-sm sm:text-base text-[#212121]/70 max-w-2xl mx-auto">
+        Tools that I work with.
+      </p>
+    </div>
+
+    <StackSpotlightGrid />
+  </div>
+</section>
+
+<section id="story">
+  
+</section>
+
+<section id="contact"></section>
+
     </main>
   );
 }

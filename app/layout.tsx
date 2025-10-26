@@ -3,6 +3,7 @@ import { Poppins } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import SmoothScroll from "@/components/SmoothScroll";
+import CursorVierre from "@/components/CursorVierre";
 
 export const metadata: Metadata = {
   title: "Vierre",
@@ -18,7 +19,17 @@ const poppins = Poppins({
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className="bg-[#e6e6e6] text-[#212121] antialiased">
+      <head>
+        {/* Load Bebas Neue from Google Fonts */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+      <body className={`${poppins.className} bg-[#e6e6e6] text-[#212121] antialiased`}>
+        <CursorVierre />
         <SmoothScroll />
         <Navbar />
         {children}
