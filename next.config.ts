@@ -4,7 +4,7 @@ const nextConfig: NextConfig = {
   output: "standalone",
   reactStrictMode: true,
 
-  // SEMENTARA untuk unblock deploy awal (boleh kamu hidupkan lagi nanti):
+  // Nonaktifkan lint & TS saat build (sementara, agar deploy lancar)
   eslint: { ignoreDuringBuilds: true },
   typescript: { ignoreBuildErrors: true },
 };
