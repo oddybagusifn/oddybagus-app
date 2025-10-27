@@ -1,30 +1,33 @@
 # ---------- Build ----------
-FROM node:20-alpine AS builder
+FROM node:20-bullseye-slim AS builder
 WORKDIR /app
 
-# Fix umum untuk Next.js/Sharp di Alpine (musl)
-RUN apk add --no-cache libc6-compat
+# paket dasar yang aman
+RUN apt-get update -y && apt-get install -y --no-install-recommends \
+    ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
 
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV TURBOPACK=0
 
-# Install deps
+# deps
 COPY package*.json ./
 RUN npm ci
 
-# Copy source & build
+# source & build
 COPY . .
-# Pastikan next.config.ts berisi:  output: "standalone"
+# pastikan next.config.ts memiliki:  output: "standalone"
+# sementara: ignore lint/TS sudah kita set di next.config.ts
 RUN npm run build
 
 # ---------- Run (standalone) ----------
-FROM node:20-alpine
+FROM node:20-bullseye-slim
 WORKDIR /app
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# Copy hasil build — wajib bawa .next/static agar CSS/JS tidak 404
+# Copy hasil build — WAJIB sertakan .next/static agar CSS/JS tidak 404
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/public ./public
