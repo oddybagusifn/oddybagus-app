@@ -14,8 +14,7 @@ jobs:
       contents: read
       packages: write
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
@@ -30,6 +29,7 @@ jobs:
           context: .
           file: Dockerfile
           push: true
+          no-cache: true     # <— pastikan build tidak pakai cache lama Turbopack
           tags: |
             ${{ env.IMAGE_NAME }}
             ghcr.io/${{ github.repository }}:${{ github.sha }}
@@ -48,7 +48,8 @@ jobs:
           script: |
             set -euxo pipefail
             cd ${{ secrets.APP_PATH }}
-            echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u "${{ secrets.GHCR_USER }}" --password-stdin || true
+            # uncomment jika paket GHCR private:
+            # echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u "${{ secrets.GHCR_USER }}" --password-stdin
             docker pull ghcr.io/${{ github.repository }}:latest || true
             docker compose down || true
             docker compose up -d
