@@ -1,34 +1,30 @@
-# ---------- Build ----------
+# --- Build tahap Next export ---
 FROM node:20-bullseye-slim AS builder
 WORKDIR /app
-
-RUN apt-get update -y && apt-get install -y --no-install-recommends ca-certificates \
-  && rm -rf /var/lib/apt/lists/*
-
-# Matikan Telemetry & Turbopack saat build prod
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV NEXT_DISABLE_TURBOPACK=1
-ENV NEXT_TURBOPACK=0
-ENV TURBOPACK=0
 
 COPY package*.json ./
 RUN npm ci
 
 COPY . .
-# pastikan next.config.ts: output: "standalone"
+# menghasilkan folder out/
 RUN npm run build
 
-# ---------- Run (standalone) ----------
-FROM node:20-bullseye-slim
-WORKDIR /app
+# --- Run tahap Nginx (serve file statis) ---
+FROM nginx:stable-alpine
+# Nginx conf simpel + SPA fallback ke index.html
+RUN printf 'server {\n\
+  listen 80;\n\
+  server_name _;\n\
+  root /usr/share/nginx/html;\n\
+  index index.html;\n\
+  location / {\n\
+    try_files $uri $uri/ /index.html;\n\
+  }\n\
+  location /_next/static/ {\n\
+    add_header Cache-Control "public, max-age=31536000, immutable";\n\
+  }\n\
+}\n' > /etc/nginx/conf.d/default.conf
 
-ENV NODE_ENV=production
-ENV NEXT_TELEMETRY_DISABLED=1
-
-# Hasil build — WAJIB sertakan .next/static agar CSS/JS tidak 404
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
-COPY --from=builder /app/public ./public
-
-EXPOSE 3000
-CMD ["node", "server.js"]
+COPY --from=builder /app/out /usr/share/nginx/html
+EXPOSE 80

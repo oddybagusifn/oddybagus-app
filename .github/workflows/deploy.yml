@@ -23,13 +23,13 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push Docker image
+      - name: Build and push Docker image (Nginx static)
         uses: docker/build-push-action@v6
         with:
           context: .
           file: Dockerfile
           push: true
-          no-cache: true     # <— pastikan build tidak pakai cache lama Turbopack
+          no-cache: true
           tags: |
             ${{ env.IMAGE_NAME }}
             ghcr.io/${{ github.repository }}:${{ github.sha }}
@@ -48,8 +48,16 @@ jobs:
           script: |
             set -euxo pipefail
             cd ${{ secrets.APP_PATH }}
-            # uncomment jika paket GHCR private:
-            # echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u "${{ secrets.GHCR_USER }}" --password-stdin
-            docker pull ghcr.io/${{ github.repository }}:latest || true
+            docker pull ghcr.io/${{ github.repository }}:latest
+            # siapkan compose lalu up
+            cat > docker-compose.yml <<'YAML'
+            services:
+              web:
+                image: ghcr.io/${GITHUB_REPOSITORY}:latest
+                container_name: vierre-web
+                restart: always
+                ports:
+                  - "80:80"
+            YAML
             docker compose down || true
             docker compose up -d

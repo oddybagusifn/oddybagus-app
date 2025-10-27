@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "NEXT_DISABLE_TURBOPACK=1 NEXT_TURBOPACK=0 TURBOPACK=0 next build",
-    "start": "next start",
+    "build": "next build && next export",
+    "start": "npx serve -s out",
     "lint": "eslint"
   },
   "dependencies": {
