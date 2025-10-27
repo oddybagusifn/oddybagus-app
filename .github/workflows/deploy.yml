@@ -1,7 +1,8 @@
 name: build-and-deploy
+
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main" ]   # jalan otomatis setiap push ke branch main
 
 env:
   IMAGE_NAME: ghcr.io/${{ github.repository }}:latest
@@ -11,22 +12,23 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      packages: write
+      packages: write   # agar bisa push image ke registry GitHub
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Login to GHCR
+      - name: Log in to GHCR
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push image
+      - name: Build and push Docker image
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: Dockerfile
+          file: Dockerfile       # pastikan Dockerfile sudah ada di root repo kamu
           push: true
           tags: |
             ${{ env.IMAGE_NAME }}
@@ -36,7 +38,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: SSH to VPS & deploy
+      - name: SSH to VPS and deploy
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.SSH_HOST }}
