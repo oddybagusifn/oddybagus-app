@@ -1,17 +1,18 @@
-# --- Build tahap Next export ---
+# --- Build tahap Next export (otomatis ke 'out/' karena output: export) ---
 FROM node:20-bullseye-slim AS builder
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 
 COPY package*.json ./
 RUN npm ci
-
 COPY . .
-# menghasilkan folder out/
+
+# Hasilkan /app/out
 RUN npm run build
 
 # --- Run tahap Nginx (serve file statis) ---
 FROM nginx:stable-alpine
+
 # Nginx conf simpel + SPA fallback ke index.html
 RUN printf 'server {\n\
   listen 80;\n\

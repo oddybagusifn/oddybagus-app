@@ -4,11 +4,9 @@ const nextConfig: NextConfig = {
   // full static export
   output: "export",
   reactStrictMode: true,
+  images: { unoptimized: true }, // jika pakai next/image
 
-  // jika pakai next/image, wajib non-optimized untuk export
-  images: { unoptimized: true },
-
-  // agar deploy awal tidak ketahan
+  // supaya deploy awal tidak ketahan
   eslint: { ignoreDuringBuilds: true },
   typescript: { ignoreBuildErrors: true },
 };
