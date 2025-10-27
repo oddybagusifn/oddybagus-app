@@ -34,19 +34,23 @@ jobs:
             ${{ env.IMAGE_NAME }}
             ghcr.io/${{ github.repository }}:${{ github.sha }}
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy to VPS via SSH
-        uses: appleboy/ssh-action@v1.2.0
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_KEY }}
-          script: |
-            set -e
-            cd ${{ secrets.APP_PATH }}
-            docker pull ${{ env.IMAGE_NAME }} || true
-            docker compose down || true
-            docker compose up -d --pull always
+deploy:
+  needs: build
+  runs-on: ubuntu-latest
+  steps:
+    - name: Deploy to VPS via SSH
+      uses: appleboy/ssh-action@v1.2.0
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USER }}
+        key: ${{ secrets.SSH_KEY }}
+        script_stop: true
+        script: |
+          set -euxo pipefail
+          cd ${{ secrets.APP_PATH }}
+          echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u "${{ secrets.GHCR_USER }}" --password-stdin
+          docker pull ghcr.io/${{ github.repository }}:latest
+          docker compose down || true
+          docker compose up -d
+
+
