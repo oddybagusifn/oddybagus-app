@@ -40,9 +40,6 @@ jobs:
     steps:
       - name: Deploy to VPS via SSH
         uses: appleboy/ssh-action@v1.2.0
-        env:
-          GHCR_USER: ${{ github.repository_owner }}
-          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}   # PAT dengan scope read:packages
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
@@ -51,8 +48,10 @@ jobs:
           script: |
             set -euxo pipefail
             cd ${{ secrets.APP_PATH }}
-            echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
+            # login ke GHCR pakai owner repo + PAT read:packages
+            echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u "${{ github.repository_owner }}" --password-stdin
             docker pull ghcr.io/${{ github.repository }}:latest
             docker compose down || true
             docker compose up -d
+
 
