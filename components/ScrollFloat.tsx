@@ -5,7 +5,6 @@ import React, { useLayoutEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-// Register once on the client (avoid SSR/TS errors)
 if (typeof window !== "undefined" && !(gsap as any).plugins?.ScrollTrigger) {
   gsap.registerPlugin(ScrollTrigger);
 }
@@ -35,7 +34,7 @@ export default function ScrollFloat({
     const el = wrapRef.current;
     if (!el) return;
 
-    // Build .char spans only once (preserve spaces with NBSP)
+    // Build span .char sekali saja
     if (!el.querySelector(".char")) {
       const raw = el.textContent ?? "";
       el.textContent = "";
@@ -45,9 +44,22 @@ export default function ScrollFloat({
           el.appendChild(document.createElement("br"));
           continue;
         }
+
         const span = document.createElement("span");
-        span.className = "char inline-block";
-        span.textContent = ch === " " ? "\u00A0" : ch; // keep spaces visible
+        span.className = "char";
+
+        span.textContent = ch === " " ? "\u00A0" : ch;
+
+        // 🎨 gradient langsung via style
+        span.style.backgroundImage =
+          "linear-gradient(120deg,#ff6bcb,#feca57,#54a0ff,#5f27cd,#1dd1a1,#ff9ff3)";
+        span.style.backgroundSize = "300% 300%";
+        span.style.backgroundPosition = "0% 50%";
+        span.style.webkitBackgroundClip = "text";
+        span.style.backgroundClip = "text";
+        span.style.color = "transparent";
+        span.style.webkitTextFillColor = "transparent";
+
         el.appendChild(span);
       }
     }
@@ -56,10 +68,10 @@ export default function ScrollFloat({
     if (!chars.length) return;
 
     const ctx = gsap.context(() => {
+      // ✨ FLOAT + SCRUB (scroll)
       gsap.fromTo(
         chars,
         {
-          willChange: "opacity, transform",
           opacity: 0,
           yPercent: 120,
           scaleY: 2.3,
@@ -82,6 +94,19 @@ export default function ScrollFloat({
           },
         }
       );
+
+      // 🎛️ ANIMASI GRADIENT BOLAK-BALIK (NO JUMP, SUPER SMOOTH)
+      gsap.fromTo(
+        chars,
+        { backgroundPosition: "0% 50%" },
+        {
+          backgroundPosition: "200% 50%",
+          duration: 4,
+          ease: "linear",
+          repeat: -1,
+          yoyo: true, // 🔥 ini membuat animasi bergerak kanan → kiri → kanan … tanpa patah
+        }
+      );
     }, el);
 
     return () => ctx.revert();
@@ -90,7 +115,7 @@ export default function ScrollFloat({
   return (
     <span
       ref={wrapRef}
-      className={`inline-block will-change-transform ${className}`}
+      className={`inline-block will-change-transform scroll-float-text ${className}`}
     >
       {children}
     </span>

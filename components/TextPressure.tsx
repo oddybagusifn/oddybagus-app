@@ -25,6 +25,11 @@ interface TextPressureProps {
   wdthMin?: number;
   wdthMax?: number;
   italMax?: number;
+
+  // ✨ gradient controls
+  gradient?: boolean;
+  gradientColors?: string; // linear-gradient(...)
+  gradientSpeed?: number; // detik
 }
 
 const TextPressure: React.FC<TextPressureProps> = ({
@@ -44,12 +49,15 @@ const TextPressure: React.FC<TextPressureProps> = ({
   minFontSize = 24,
   inline = false,
 
-  // defaults so it isn't too thin/narrow
   wghtMin = 520,
   wghtMax = 900,
   wdthMin = 90,
   wdthMax = 200,
   italMax = 1,
+
+  gradient = false,
+  gradientColors = "linear-gradient(120deg,#ff6bcb,#feca57,#54a0ff,#5f27cd,#1dd1a1,#ff9ff3)",
+  gradientSpeed = 8,
 }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const titleRef = useRef<HTMLElement | null>(null);
@@ -67,14 +75,12 @@ const TextPressure: React.FC<TextPressureProps> = ({
   const dist = (a: { x: number; y: number }, b: { x: number; y: number }) =>
     Math.hypot(b.x - a.x, b.y - a.y);
 
-  // keep refs array sized (avoids undefined indexes)
   useEffect(() => {
     if (spansRef.current.length !== chars.length) {
       spansRef.current = Array(chars.length).fill(null);
     }
   }, [chars.length]);
 
-  // fit (non-inline)
   const setSize = () => {
     if (inline) return;
     if (!containerRef.current || !titleRef.current) return;
@@ -134,7 +140,6 @@ const TextPressure: React.FC<TextPressureProps> = ({
     }
   }, [scale, text, inline]);
 
-  // animate variable font axes by distance to eased pointer
   useEffect(() => {
     let raf: number;
     const tick = () => {
@@ -189,6 +194,7 @@ const TextPressure: React.FC<TextPressureProps> = ({
     className,
     flex && !inline ? "flex" : "",
     stroke ? "stroke" : "",
+    gradient ? "text-pressure-gradient" : "",
   ]
     .filter(Boolean)
     .join(" ");
@@ -220,13 +226,25 @@ const TextPressure: React.FC<TextPressureProps> = ({
           -webkit-text-stroke-width:3px;
           -webkit-text-stroke-color:${strokeColor};
         }
-        .text-pressure-title{ color:${textColor}; }
+        .text-pressure-gradient{
+          background-size: 300% 300%;
+          animation: tp-gradient-shift var(--tp-grad-speed, 8s) ease-in-out infinite;
+          -webkit-background-clip: text;
+          background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
+        @keyframes tp-gradient-shift{
+          0%   { background-position: 0% 50%; }
+          50%  { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
       `}</style>
 
       <TitleTag
         ref={titleRef as React.Ref<any>}
-        className={`text-pressure-title ${dyn}`}
+        className={dyn}
         style={{
+          "--tp-grad-speed": `${gradientSpeed}s`,
           fontFamily,
           textTransform: "uppercase",
           fontSize: inline ? "1em" : fontSize,
@@ -241,18 +259,21 @@ const TextPressure: React.FC<TextPressureProps> = ({
           width: inline ? "auto" : "100%",
           display: inline ? "inline-block" : "block",
           verticalAlign: "baseline",
-        }}
+          color: gradient ? "transparent" : textColor,
+          backgroundImage: gradient ? gradientColors : undefined,
+        } as React.CSSProperties}
       >
         {chars.map((c, i) => (
           <span
             key={i}
             ref={(el: HTMLSpanElement | null) => {
-              spansRef.current[i] = el; // <-- no return value
+              spansRef.current[i] = el;
             }}
             data-char={c}
             style={{
               display: "inline-block",
-              color: stroke ? undefined : textColor,
+              // jangan override warna kalau gradient
+              color: stroke || gradient ? undefined : textColor,
             }}
           >
             {c}

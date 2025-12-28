@@ -55,9 +55,7 @@ export default function BuildsSection({ projects }: BuildsSectionProps) {
       if (mediaWrap) {
         // set state awal (tertutup dari kanan atau kiri, tergantung sisi gambar)
         const fromRight = row.dataset.imageSide === "right";
-        const fromClip = fromRight
-          ? "inset(0 0 0 100%)"
-          : "inset(0 100% 0 0)";
+        const fromClip = fromRight ? "inset(0 0 0 100%)" : "inset(0 100% 0 0)";
 
         gsap.set(mediaWrap, {
           clipPath: fromClip,
@@ -198,14 +196,16 @@ function BuildRow({ project, index }: { project: Project; index: number }) {
     <div
       className={[
         "piece piece-title col-span-6",
-        imageLeft ? "order-2 pl-2 sm:pl-3 md:pl-6" : "order-1 pr-2 sm:pr-3 md:pr-6",
+        imageLeft
+          ? "order-2 pl-2 sm:pl-3 md:pl-6"
+          : "order-1 pr-2 sm:pr-3 md:pr-6",
         "flex items-center",
       ].join(" ")}
     >
       <div className={imageLeft ? "text-left" : "text-right"}>
         <h3
           className={[
-            "leading-[0.9] font-extrabold text-[#212121] tracking-tight",
+            "leading-[0.9] font-extrabold text-[#ebebeb] tracking-tight",
             "text-[clamp(26px,7.8vw,70px)] md:text-[clamp(36px,6.2vw,92px)]",
           ].join(" ")}
           style={{ letterSpacing: "-0.01em" }}
@@ -229,7 +229,7 @@ function BuildRow({ project, index }: { project: Project; index: number }) {
                     key={i}
                     className={[
                       "px-3 py-1 text-[13px] sm:text-[14px] font-semibold select-none",
-                      "border border-[#212121] text-[#212121] bg-transparent",
+                      "border border-[#212121] text-[#ebebeb] bg-transparent",
                       "rounded-full",
                       "transition-colors hover:bg-[#212121] hover:text-[#e6e6e6]",
                     ].join(" ")}
@@ -254,21 +254,25 @@ function BuildRow({ project, index }: { project: Project; index: number }) {
         imageLeft ? "order-1" : "order-2",
         "mx-[2px] sm:mx-[4px]",
         "block",
+        // ⭐ SUPER SMOOTH CARD SHRINK
+        "transform-gpu will-change-transform",
+        "transition-transform duration-[1500ms]",
+        "ease-[cubic-bezier(0.16,1,0.3,1)]",
+        "hover:scale-[0.94]", // sedikit mengecil (smooth)
       ].join(" ")}
     >
       <div
         className={[
           "media-wrap relative overflow-hidden w-full rounded-none bg-[#e6e6e6]",
-          "ring-1 ring-[#212121]/12 shadow-[0_6px_20px_rgba(33,33,33,0.06)]",
-          "transform-gpu transition-transform duration-[1200ms] ease-[cubic-bezier(.22,1,.36,1)]",
-          "group-hover/card:scale-[0.982] md:group-hover/card:scale-[0.985]",
+          "ring-1 ring-[#212121]/12 shadow-[0_6px_20px_rgba(33,33,33,0.18)]",
+          "transform-gpu will-change-transform",
         ].join(" ")}
-        style={{ ...boxStyle, willChange: "transform" }}
+        style={{ ...boxStyle }}
       >
         {/* Sheen */}
         <span className="media-sheen" />
 
-        {/* Gambar */}
+        {/* ⭐ SUPER SMOOTH ZOOM-IN IMAGE */}
         <img
           src={project.cover}
           alt={project.title}
@@ -278,13 +282,14 @@ function BuildRow({ project, index }: { project: Project; index: number }) {
           referrerPolicy="no-referrer"
           className={[
             "absolute inset-0 w-full h-full object-cover",
-            "grayscale contrast-110 saturate-0 opacity-[0.92]",
-            "transform-gpu transition-transform duration-[1200ms] ease-[cubic-bezier(.22,1,.36,1)]",
-            // hover: isi gambar zoom lebih dalam (ken burns mini)
-            "group-hover/card:scale-[1.14]",
-            "group-hover/card:grayscale-0 group-hover/card:saturate-100 group-hover/card:opacity-100",
+            "transform-gpu will-change-transform",
+            // Durasi lebih lama agar buttery-smooth
+            "transition-transform duration-[1500ms]",
+            // Ease ultra smooth
+            "ease-[cubic-bezier(0.16,1,0.3,1)]",
+            // ⭐ Zoom in lembut tanpa patah
+            "group-hover/card:scale-[1.18]",
           ].join(" ")}
-          style={{ willChange: "transform" }}
         />
       </div>
     </a>

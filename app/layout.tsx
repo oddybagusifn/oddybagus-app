@@ -5,6 +5,8 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import SmoothScroll from "@/components/SmoothScroll";
 import CursorVierre from "@/components/CursorVierre";
+import CircularCursor from "@/components/CircularCursor";
+import "@/components/CircularCursor.css";
 
 export const metadata: Metadata = {
   title: "Vierre",
@@ -28,8 +30,8 @@ const bebas = Bebas_Neue({
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={`${poppins.variable} ${bebas.variable} bg-[#e6e6e6] text-[#212121] antialiased`}>
-        <CursorVierre />
+      <body className={`${poppins.variable} ${bebas.variable} bg-[#0c0c0c] text-[#ebebeb]  antialiased`}>
+        <CircularCursor />
         <SmoothScroll />
         <Navbar />
         {children}

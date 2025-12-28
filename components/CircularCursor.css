@@ -1,0 +1,39 @@
+* {
+  cursor: none !important;
+}
+
+.circular-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 9999;
+  mix-blend-mode: difference; /* 🔥 AUTO COLOR ADAPT */
+}
+
+.circular-text {
+  width: 120px;
+  height: 120px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: center;
+  mix-blend-mode: difference;
+}
+
+.cursor-dot {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 6px;
+  height: 6px;
+  background: white;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  mix-blend-mode: difference;
+}
+
+.circular-text,
+.cursor-dot {
+  transition: mix-blend-mode 0.2s ease;
+}
