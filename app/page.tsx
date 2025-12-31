@@ -15,7 +15,9 @@ import ScrambledText from "@/components/ScrambledText";
 import SlideInOnScroll from "@/components/SlideInOnScroll";
 import TrackWavePlayer, { Track } from "@/components/TrackWavePlayer";
 import FloatingMiniPlayer from "@/components/FloatingMiniPlayer";
-import PixelCard from "@/components/PixelCard";
+import TiltedCard from "@/components/TiltedCard";
+import { FiSend } from "react-icons/fi";
+import Contact from "@/components/Contact";
 
 const projects = [
   {
@@ -88,7 +90,7 @@ const skills = [
   "MySQL",
   "REST API",
   "PHP",
-  "Git/GitHub",
+  "Git",
   "Web Design",
   "Unity 2D",
   "FL Studio 21",
@@ -208,62 +210,57 @@ export default function Home() {
 
           {/* Cards */}
           <BuildsSection projects={projects} />
+        </div>
 
-          {/* ===== Marquee with reveal ===== */}
-          <div className="py-16 text-[#ebebeb]">
-            <RevealSwipeFM direction="up" delay={0.1} duration={0.5}>
-              <MarqueeVierre
-                text="VIERRE."
-                repeat={22}
-                duration={24}
-                gap="0rem"
-              />
-            </RevealSwipeFM>
-          </div>
+        {/* ===== Marquee with reveal ===== */}
+        <div className="relative py-16 text-[#ebebeb] ">
+          <RevealSwipeFM direction="up" delay={0.1} duration={0.5}>
+            <MarqueeVierre text="VIERRE." repeat={22} duration={24} />
+          </RevealSwipeFM>
+        </div>
 
-          {/* SECTION AUDIO */}
-          <section className="relative w-full px-4 sm:px-6 mt-16">
-            <div className="mx-auto max-w-[1600px] space-y-4">
-              <h2 className="text-sm font-semibold tracking-[0.2em] text-[#ebebeb] uppercase">
-                VIerre Audio
-              </h2>
+        {/* SECTION AUDIO */}
+        <section className="relative w-full px-4 sm:px-6 mt-16">
+          <div className="mx-auto max-w-[1600px] space-y-4">
+            <h2 className="text-sm font-semibold tracking-[0.2em] text-[#ebebeb] uppercase">
+              VIerre Audio
+            </h2>
 
-              <p className="text-sm text-[#ebebeb]">
-                Short 40s previews of some tracks I’ve produced.
-              </p>
+            <p className="text-sm text-[#ebebeb]">
+              Short 40s previews of some tracks I’ve produced.
+            </p>
 
-              <div className="space-y-3">
-                {tracks.map((t) => (
-                  <TrackWavePlayer key={t.id} track={t} previewSeconds={40} />
-                ))}
-              </div>
+            <div className="space-y-3">
+              {tracks.map((t) => (
+                <TrackWavePlayer key={t.id} track={t} previewSeconds={40} />
+              ))}
+            </div>
 
-              {/* CTA di kanan */}
-              <div className="flex justify-end mt-6">
-                <a
-                  href="https://soundcloud.com/imvierre"
-                  target="_blank"
-                  className="group relative inline-flex items-center gap-3
+            {/* CTA di kanan */}
+            <div className="flex justify-end mt-6">
+              <a
+                href="https://soundcloud.com/imvierre"
+                target="_blank"
+                className="group relative inline-flex items-center gap-3
          rounded-full px-6 py-3 bg-[#0c0c0c] text-[#ebebeb] font-medium
          overflow-hidden transition-all border"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  className="w-5 h-5"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                    className="w-5 h-5"
-                  >
-                    <path d="M17.5 10.5c-.7 0-1.3.2-1.8.6-.3-2.8-2.6-5-5.5-5-2.3 0-4.3 1.4-5.1 3.4-.2 0-.4-.1-.6-.1-2 0-3.5 1.7-3.5 3.8S2.5 17 4.5 17h13c1.7 0 3-1.5 3-3.3s-1.3-3.2-3-3.2z" />
-                  </svg>
+                  <path d="M17.5 10.5c-.7 0-1.3.2-1.8.6-.3-2.8-2.6-5-5.5-5-2.3 0-4.3 1.4-5.1 3.4-.2 0-.4-.1-.6-.1-2 0-3.5 1.7-3.5 3.8S2.5 17 4.5 17h13c1.7 0 3-1.5 3-3.3s-1.3-3.2-3-3.2z" />
+                </svg>
 
-                  <span className="relative z-10">
-                    Want to listen to more? Check it out on SoundCloud →
-                  </span>
-                </a>
-              </div>
+                <span className="relative z-10">
+                  Want to listen to more? Check it out on SoundCloud →
+                </span>
+              </a>
             </div>
-          </section>
-        </div>
+          </div>
+        </section>
       </section>
 
       <FloatingMiniPlayer />
@@ -322,9 +319,8 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="about-me" className="px-4 sm:px-6 py-16">
+      <section id="contact" className="px-4 sm:px-6 py-16">
         <div className="mx-auto max-w-[1600px]">
-          {/* Title */}
           <div className="py-10 md:py-14">
             <h1 className="text-[36px] md:text-[44px] font-extrabold tracking-[.08em]">
               <ScrollFloat
@@ -334,47 +330,17 @@ export default function Home() {
                 scrollEnd="bottom bottom-=40%"
                 stagger={0.03}
               >
-                STORY OF VIERRE
+                CONNECT WITH VIERRE
               </ScrollFloat>
             </h1>
             <p className="mt-2 text-sm sm:text-base text-[#ebebeb]/70 max-w-2xl">
-              A short introduction about who I am and how Vierre was built.
+              Feel free to reach out for collaborations, projects, or creative
+              discussions.
             </p>
-          </div>
-
-          {/* Content */}
-          <div className="grid gap-10 md:grid-cols-2 items-center">
-            {/* Pixel Card */}
-            <PixelCard variant="blue" className="w-[480px] h-[480px]">
-              <img
-                src="/vierre.jpg"
-                alt="Vierre"
-                className="w-full h-full object-cover rounded-xl"
-              />
-            </PixelCard>
-
-            {/* Story Text */}
-            <div className="max-w-xl">
-              <h2 className="text-2xl font-semibold mb-4">Who is Vierre?</h2>
-              <p className="text-[#ebebeb]/80 leading-relaxed">
-                Vierre is a creative identity built from curiosity,
-                experimentation, and a strong passion for digital craftsmanship.
-                Starting from simple ideas and personal projects, Vierre evolved
-                into a space where design, technology, and music intersect.
-              </p>
-
-              <p className="mt-4 text-[#ebebeb]/80 leading-relaxed">
-                This journey is not only about building visually appealing
-                interfaces, but also about creating meaningful experiences.
-                Every project reflects growth, persistence, and a desire to turn
-                imagination into something tangible.
-              </p>
-            </div>
+            <Contact />
           </div>
         </div>
       </section>
-
-      <section id="contact"></section>
     </main>
   );
 }

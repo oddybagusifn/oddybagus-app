@@ -305,3 +305,119 @@ html { scroll-behavior: auto; }
   }
 }
 
+/* POP ANIMATION */
+.toast-pop {
+  animation: popIn 0.35s ease-out, popOut 0.4s ease-in 3.6s forwards;
+}
+
+/* POP IN / OUT */
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes popOut {
+  to {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+}
+
+/* ================= BORDER ================= */
+
+.toast-border {
+  padding: 2px;
+  border-radius: 999px;
+  background-size: 400% 400%;
+  animation: borderFlow 5s linear infinite;
+}
+
+/* SUCCESS */
+.toast-success {
+  background-image: linear-gradient(
+    120deg,
+    #ff6bcb,
+    #54a0ff,
+    #5f27cd,
+    #1dd1a1
+  );
+}
+
+/* ERROR */
+.toast-error {
+  background-image: linear-gradient(
+    120deg,
+    #ff2d2d,
+    #ff6b6b,
+    #ff2d2d
+  );
+  animation: borderFlow 2s linear infinite, shake 0.35s ease-in-out;
+}
+
+/* INNER */
+.toast-inner {
+  background: #0a0a0a;
+  padding: 16px 28px;
+  border-radius: 999px;
+  box-shadow: 0 0 25px rgba(255, 80, 80, 0.25);
+}
+
+/* TEXT */
+.toast-text {
+  font-weight: 600;
+  font-size: 15px;
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: textFlow 2.5s linear infinite;
+}
+
+/* TEXT COLOR */
+.text-success {
+  background-image: linear-gradient(120deg, #ff6bcb, #54a0ff, #5f27cd);
+}
+
+.text-error {
+  background-image: linear-gradient(120deg, #ffffff, #ff9b9b, #ffffff);
+  animation: textFlow 1.5s linear infinite, pulse 1s ease-in-out infinite;
+}
+
+/* EFFECTS */
+@keyframes borderFlow {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 400% 50%; }
+}
+
+@keyframes textFlow {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 300% 50%; }
+}
+
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-2px); }
+  50% { transform: translateX(2px); }
+  75% { transform: translateX(-1px); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+
+
+
+
+
+
+
+
+

@@ -91,14 +91,12 @@ export default function MarqueeVierre({
 
           /* ★ text gradient using provided palette */
           background-image: linear-gradient(
-            90deg,
+            120deg,
             #ff6bcb,
-            #feca57,
             #54a0ff,
             #5f27cd,
-            #1dd1a1,
-            #ff9ff3
-          );
+            #1dd1a1
+            );
           background-size: 200% 100%;
           -webkit-background-clip: text;
           background-clip: text;

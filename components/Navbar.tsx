@@ -9,13 +9,12 @@ import {
 } from "react";
 import { Moon, Sun, X } from "lucide-react";
 
-const NAV = ["BUILDS", "STACK", "ABOUT", "CONTACT"] as const;
+const NAV = ["BUILDS", "STACK", "CONTACT"] as const;
 type NavLabel = (typeof NAV)[number];
 
 const SECTION_ID: Record<NavLabel, string> = {
   BUILDS: "builds",
   STACK: "stack",
-  ABOUT: "about-me",
   CONTACT: "contact",
 };
 
@@ -132,7 +131,6 @@ export default function Navbar() {
   const liRefs = useRef<Record<NavLabel, HTMLLIElement | null>>({
     BUILDS: null,
     STACK: null,
-    ABOUT: null,
     CONTACT: null,
   });
 

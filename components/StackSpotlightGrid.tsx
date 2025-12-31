@@ -10,7 +10,7 @@ import {
   SiJavascript,
   SiFigma,
   SiUnity,
-  SiGithub,
+  SiGit,
 } from "react-icons/si";
 import { TbApi } from "react-icons/tb";
 import React from "react";
@@ -42,7 +42,7 @@ const skills: Skill[] = [
   { slug: "rest-api", name: "REST API", Icon: TbApi },
   { slug: "figma", name: "Figma", Icon: SiFigma },
   { slug: "unity2d", name: "Unity 2D", Icon: SiUnity },
-  { slug: "git-github", name: "Git / GitHub", Icon: SiGithub },
+  { slug: "git", name: "Git", Icon: SiGit },
   { slug: "fl-studio", name: "FL Studio 21", Icon: FlStudioIcon },
 ];
 
