@@ -18,6 +18,7 @@ import FloatingMiniPlayer from "@/components/FloatingMiniPlayer";
 import TiltedCard from "@/components/TiltedCard";
 import { FiSend } from "react-icons/fi";
 import Contact from "@/components/Contact";
+import ModelViewer from "@/components/ModelViewer";
 
 const projects = [
   {
@@ -107,7 +108,7 @@ export default function Home() {
           {/* BALLPIT SEBAGAI BACKGROUND FULL 100VH */}
           <Ballpit
             className="absolute inset-0 -z-10 h-full w-full"
-            count={150}
+            count={90}
             gravity={0.1}
             friction={2}
             wallBounce={0.1}
@@ -321,23 +322,33 @@ export default function Home() {
 
       <section id="contact" className="px-4 sm:px-6 py-16">
         <div className="mx-auto max-w-[1600px]">
-          <div className="py-10 md:py-14">
-            <h1 className="text-[36px] md:text-[44px] font-extrabold tracking-[.08em]">
-              <ScrollFloat
-                animationDuration={1}
-                ease="back.inOut(3)"
-                scrollStart="center bottom+=50%"
-                scrollEnd="bottom bottom-=40%"
-                stagger={0.03}
-              >
-                CONNECT WITH VIERRE
-              </ScrollFloat>
-            </h1>
-            <p className="mt-2 text-sm sm:text-base text-[#ebebeb]/70 max-w-2xl">
-              Feel free to reach out for collaborations, projects, or creative
-              discussions.
-            </p>
-            <Contact />
+          <div className="grid md:grid-cols-2 gap-16 items-center">
+            {/* LEFT - TEXT & FORM */}
+            <div>
+              <h1 className="text-[36px] md:text-[44px] font-extrabold tracking-[.08em]">
+                <ScrollFloat
+                  animationDuration={1}
+                  ease="back.inOut(3)"
+                  scrollStart="center bottom+=50%"
+                  scrollEnd="bottom bottom-=40%"
+                  stagger={0.03}
+                >
+                  CONNECT WITH VIERRE
+                </ScrollFloat>
+              </h1>
+
+              <p className="mt-2 text-sm sm:text-base text-[#ebebeb]/70 max-w-2xl">
+                Feel free to reach out for collaborations, projects, or creative
+                discussions.
+              </p>
+
+              <Contact />
+            </div>
+
+            {/* RIGHT - 3D MODEL */}
+            <div className="relative w-full h-[480px]">
+              <ModelViewer />
+            </div>
           </div>
         </div>
       </section>

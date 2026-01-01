@@ -26,6 +26,7 @@ import {
 } from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { clone as cloneSkeleton } from "three/examples/jsm/utils/SkeletonUtils.js";
+import * as THREE from "three";
 
 /* -------------------------------------------------------------------------- */
 /*  Types & Helpers                                                           */
@@ -46,6 +47,10 @@ interface SizeData {
   ratio: number;
   pixelRatio: number;
 }
+
+const isMobile =
+  typeof window !== "undefined" &&
+  /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
 /** Wrapper renderer + camera + resize/visibility */
 class X {
@@ -219,6 +224,11 @@ class X {
   }
 
   #updateRenderer() {
+    const maxPixelRatio = isMobile ? 1.25 : 2;
+    this.renderer.setPixelRatio(
+      Math.min(window.devicePixelRatio, maxPixelRatio)
+    );
+
     this.renderer.setSize(this.size.width, this.size.height);
     this.#postprocessing?.setSize(this.size.width, this.size.height);
 
@@ -564,7 +574,7 @@ class W {
 /* --------------------- Default config untuk Baymax ------------------------- */
 
 const DEFAULT_CONFIG: WConfig = {
-  count: 120,
+  count: isMobile ? 45 : 120,
   maxX: 5,
   maxY: 5,
   maxZ: 2,
@@ -792,6 +802,9 @@ async function createBallpit(
     rendererOptions: { antialias: true, alpha: true },
   });
 
+  threeInstance.renderer.shadowMap.enabled = true;
+  threeInstance.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
   threeInstance.renderer.toneMapping = ACESFilmicToneMapping;
   threeInstance.renderer.toneMappingExposure = 1.5;
   threeInstance.camera.position.set(0, 0, 20);
@@ -800,44 +813,54 @@ async function createBallpit(
   threeInstance.resize();
 
   // lights
-  const ambient = new AmbientLight(0xffffff, 0.3);
-  const keyLight = new PointLight(0xffffff, 18);
-  const mainLight = new PointLight(0xffffff, 46, 220, 0.7);
+  const ambient = new AmbientLight(0xffffff, 0.35);
+  const keyLight = new PointLight(0xffffff, 10, 80, 1);
+  const mainLight = new PointLight(0xffffff, 18, 120, 1);
 
   mainLight.position.set(0, 28, 24);
-  mainLight.castShadow = true;
-  mainLight.shadow.mapSize.set(2048, 2048);
+  mainLight.castShadow = !isMobile;
+  mainLight.shadow.mapSize.set(512, 512); // ringan tapi halus
+  mainLight.shadow.bias = -0.0005;
+  mainLight.shadow.normalBias = 0.02;
   mainLight.shadow.radius = 5;
 
-  const fillLight = new PointLight(0xffffff, 22, 220, 1.2);
+  const fillLight = new PointLight(0xffffff, 18, 120, 1);
   fillLight.position.set(-24, 10, 10);
   fillLight.castShadow = false;
 
   keyLight.position.set(12, 25, 14);
-  keyLight.castShadow = true;
-  keyLight.shadow.mapSize.set(2040, 2040);
+  keyLight.castShadow = false;
+  keyLight.shadow.mapSize.set(1024, 1024);
   keyLight.shadow.bias = -0.0005;
 
   const cursorLight = new PointLight(0xffffff, 12, 100, 0.3);
   cursorLight.position.set(0, 0, 8);
   cursorLight.castShadow = true;
-  cursorLight.shadow.mapSize.set(2040, 2040);
+  cursorLight.shadow.mapSize.set(1024, 1024);
   cursorLight.shadow.radius = 2.0;
 
   threeInstance.scene.add(ambient, mainLight, fillLight, cursorLight);
 
   // ground plane untuk shadow
-  const groundMat = new ShadowMaterial({ opacity: 0.45 });
-  const groundGeo = new PlaneGeometry(1, 1);
+  const groundMat = new ShadowMaterial({ opacity: 0.4 });
+  const groundGeo = new PlaneGeometry(20, 20);
   const ground = new Mesh(groundGeo, groundMat);
   ground.receiveShadow = true;
   ground.rotation.x = -Math.PI / 2;
+  ground.position.y = -0.01;
   threeInstance.scene.add(ground);
 
   // load GLB baymax
   const loader = new GLTFLoader();
   const gltf = await loader.loadAsync("/models/baymax.glb");
   const baseModel = gltf.scene;
+
+  baseModel.traverse((child) => {
+    if ((child as THREE.Mesh).isMesh) {
+      child.castShadow = true;
+      child.receiveShadow = true;
+    }
+  });
 
   // normalisasi base model ke sekitar (0,0,0)
   const box = new Box3().setFromObject(baseModel);
@@ -975,71 +998,77 @@ async function createBallpit(
   const tmpImpulse = new Vector3();
   const up = new Vector3(0, 1, 0);
 
+  let accumulator = 0;
+  const PHYSICS_STEP = 1 / 60;
+  const MAX_STEPS = window.innerWidth < 768 ? 2 : 3;
+
   threeInstance.onBeforeRender = ({ delta }) => {
     if (isPaused) return;
 
-    physics.update({ delta });
+    accumulator += delta;
 
-    for (let i = 0; i < baymaxes.length; i++) {
-      const obj = baymaxes[i];
-      const base = 3 * i;
+    let steps = 0;
 
-      const px = physics.positionData[base];
-      const py = physics.positionData[base + 1];
-      const pz = physics.positionData[base + 2];
+    while (accumulator >= PHYSICS_STEP && steps < MAX_STEPS) {
+      physics.update({ delta: PHYSICS_STEP });
 
-      obj.position.set(px, py + worldYOffset, pz);
+      for (let i = 0; i < baymaxes.length; i++) {
+        const obj = baymaxes[i];
+        const base = 3 * i;
 
-      const s = physics.sizeData[i];
-      obj.scale.setScalar(baseScale * s);
+        const px = physics.positionData[base];
+        const py = physics.positionData[base + 1];
+        const pz = physics.positionData[base + 2];
 
-      const angVel = angularVelocity[i];
+        obj.position.set(px, py + worldYOffset, pz);
 
-      tmpImpulse.set(
-        physics.collisionImpulseData[base],
-        physics.collisionImpulseData[base + 1],
-        physics.collisionImpulseData[base + 2]
-      );
-      const impulseLen = tmpImpulse.length();
-      if (impulseLen > 0.0001) {
-        const axisFromImpulse = tmpImpulse.clone().cross(up);
-        if (axisFromImpulse.lengthSq() > 0.000001) {
-          axisFromImpulse.normalize();
-          const spinAmount = impulseLen * 4;
-          const spinImpulse = axisFromImpulse.multiplyScalar(spinAmount);
-          angVel.add(spinImpulse);
+        const s = physics.sizeData[i];
+        obj.scale.setScalar(baseScale * s);
+
+        const angVel = angularVelocity[i];
+
+        // --- rotational impulse ---
+        tmpImpulse.set(
+          physics.collisionImpulseData[base],
+          physics.collisionImpulseData[base + 1],
+          physics.collisionImpulseData[base + 2]
+        );
+
+        const impulseLen = tmpImpulse.length();
+        if (impulseLen > 0.0001) {
+          const axis = tmpImpulse.clone().cross(up);
+          if (axis.lengthSq() > 0.000001) {
+            axis.normalize();
+            angVel.add(axis.multiplyScalar(impulseLen * 4));
+          }
         }
-      }
 
-      tmpVel.set(
-        physics.velocityData[base],
-        physics.velocityData[base + 1],
-        physics.velocityData[base + 2]
-      );
-      const speed = tmpVel.length();
-      const speedThreshold = 0.01;
+        // --- rolling rotation ---
+        tmpVel.set(
+          physics.velocityData[base],
+          physics.velocityData[base + 1],
+          physics.velocityData[base + 2]
+        );
 
-      if (speed > speedThreshold) {
-        tmpAxis.crossVectors(tmpVel, up);
-        if (tmpAxis.lengthSq() > 0.0001) {
-          tmpAxis.normalize();
+        const speed = tmpVel.length();
+        if (speed > 0.01) {
+          tmpAxis.crossVectors(tmpVel, up).normalize();
           const radius = s * (physics.config.colliderScale ?? 0.65);
-          const angularSpeedTarget = speed / Math.max(radius, 0.001);
-          const targetAngVel = tmpAxis.multiplyScalar(angularSpeedTarget);
-          angVel.lerp(targetAngVel, 0.18);
+          const angularSpeed = speed / Math.max(radius, 0.001);
+          angVel.lerp(tmpAxis.multiplyScalar(angularSpeed), 0.18);
+        } else {
+          angVel.multiplyScalar(0.9);
         }
-      } else {
-        angVel.multiplyScalar(0.9);
-        if (angVel.length() < 0.01) {
-          angVel.set(0, 0, 0);
+
+        // apply rotation
+        const angle = angVel.length() * PHYSICS_STEP;
+        if (angle > 0.0001) {
+          obj.rotateOnAxis(angVel.clone().normalize(), angle);
         }
       }
 
-      const angle = angVel.length() * delta;
-      if (angle > 0.0001) {
-        tmpAxis.copy(angVel).normalize();
-        obj.rotateOnAxis(tmpAxis, angle);
-      }
+      accumulator -= PHYSICS_STEP;
+      steps++;
     }
   };
 
@@ -1099,6 +1128,12 @@ const Ballpit: React.FC<BallpitProps> = (props) => {
 
     (async () => {
       const inst = await createBallpit(canvas, config);
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          inst.three.resize();
+        });
+      });
+
       if (cancelled) {
         inst.dispose();
         return;
