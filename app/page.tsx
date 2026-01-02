@@ -106,14 +106,14 @@ export default function Home() {
       <header className="relative isolate w-full">
         <section className="relative flex min-h-screen items-center justify-center overflow-hidden">
           {/* BALLPIT SEBAGAI BACKGROUND FULL 100VH */}
-          <Ballpit
+          {/* <Ballpit
             className="absolute inset-0 -z-10 h-full w-full"
             count={1}
             gravity={0.1}
             friction={2}
             wallBounce={0.1}
             followCursor={false}
-          />
+          /> */}
 
           {/* HERO TEXT DI ATAS BALLPIT */}
           <div className="relative z-10 max-w-[1600px] w-full px-4 sm:px-6 mx-auto text-center">
