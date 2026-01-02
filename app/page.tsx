@@ -2,15 +2,14 @@
 
 import Navbar from "@/components/Navbar";
 import TextPressure from "@/components/TextPressure";
-import ParticlesHeader from "@/components/ParticlesHeader";
 import ScrollReveal from "@/components/ScrollReveal";
 import ScrollFloat from "@/components/ScrollFloat";
 import BuildsSection from "@/components/BuildsSection";
 import StackSpotlightGrid from "@/components/StackSpotlightGrid";
 import MarqueeVierre from "@/components/MarqueeVierre";
 import RevealSwipeFM from "@/components/RevealSwipeFM";
-import HeadBustCanvas from "@/components/HeadBustCanvas";
-import Ballpit from "@/components/Ballpit";
+// import HeadBustCanvas from "@/components/HeadBustCanvas";
+// import Ballpit from "@/components/Ballpit";
 import ScrambledText from "@/components/ScrambledText";
 import SlideInOnScroll from "@/components/SlideInOnScroll";
 import TrackWavePlayer, { Track } from "@/components/TrackWavePlayer";
@@ -18,7 +17,7 @@ import FloatingMiniPlayer from "@/components/FloatingMiniPlayer";
 import TiltedCard from "@/components/TiltedCard";
 import { FiSend } from "react-icons/fi";
 import Contact from "@/components/Contact";
-import ModelViewer from "@/components/ModelViewer";
+// import ModelViewer from "@/components/ModelViewer";
 
 const projects = [
   {
