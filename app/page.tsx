@@ -347,7 +347,7 @@ export default function Home() {
 
             {/* RIGHT - 3D MODEL */}
             <div className="relative w-full h-[480px]">
-              <ModelViewer />
+              {/* <ModelViewer /> */}
             </div>
           </div>
         </div>
