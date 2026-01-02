@@ -181,7 +181,7 @@ export default function Home() {
 
             <SlideInOnScroll distance={400} delay={0.2}>
               <div className="flex justify-end">
-                <HeadBustCanvas />
+                {/* <HeadBustCanvas /> */}
               </div>
             </SlideInOnScroll>
           </div>
