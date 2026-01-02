@@ -108,7 +108,7 @@ export default function Home() {
           {/* BALLPIT SEBAGAI BACKGROUND FULL 100VH */}
           <Ballpit
             className="absolute inset-0 -z-10 h-full w-full"
-            count={90}
+            count={1}
             gravity={0.1}
             friction={2}
             wallBounce={0.1}

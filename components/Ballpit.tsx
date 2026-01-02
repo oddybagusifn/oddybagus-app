@@ -574,7 +574,7 @@ class W {
 /* --------------------- Default config untuk Baymax ------------------------- */
 
 const DEFAULT_CONFIG: WConfig = {
-  count: isMobile ? 45 : 120,
+  count: isMobile ? 18 : 120,
   maxX: 5,
   maxY: 5,
   maxZ: 2,
@@ -813,11 +813,11 @@ async function createBallpit(
   threeInstance.resize();
 
   // lights
-  const ambient = new AmbientLight(0xffffff, 0.35);
+  const ambient = new AmbientLight(0xffffff, 0.9);
   const keyLight = new PointLight(0xffffff, 10, 80, 1);
-  const mainLight = new PointLight(0xffffff, 18, 120, 1);
+  const mainLight = new PointLight(0xffffff, 1.2);
 
-  mainLight.position.set(0, 28, 24);
+  mainLight.position.set(0, 10, 10);
   mainLight.castShadow = !isMobile;
   mainLight.shadow.mapSize.set(512, 512); // ringan tapi halus
   mainLight.shadow.bias = -0.0005;
@@ -999,8 +999,8 @@ async function createBallpit(
   const up = new Vector3(0, 1, 0);
 
   let accumulator = 0;
-  const PHYSICS_STEP = 1 / 60;
-  const MAX_STEPS = window.innerWidth < 768 ? 2 : 3;
+  const PHYSICS_STEP = isMobile ? 1 / 30 : 1 / 60;
+  const MAX_STEPS = isMobile ? 1 : 3;
 
   threeInstance.onBeforeRender = ({ delta }) => {
     if (isPaused) return;
@@ -1043,28 +1043,33 @@ async function createBallpit(
           }
         }
 
-        // --- rolling rotation ---
-        tmpVel.set(
-          physics.velocityData[base],
-          physics.velocityData[base + 1],
-          physics.velocityData[base + 2]
-        );
+        // --- rolling rotation (DESKTOP ONLY) ---
+        if (!isMobile) {
+          tmpVel.set(
+            physics.velocityData[base],
+            physics.velocityData[base + 1],
+            physics.velocityData[base + 2]
+          );
 
-        const speed = tmpVel.length();
-        if (speed > 0.01) {
-          tmpAxis.crossVectors(tmpVel, up).normalize();
-          const radius = s * (physics.config.colliderScale ?? 0.65);
-          const angularSpeed = speed / Math.max(radius, 0.001);
-          angVel.lerp(tmpAxis.multiplyScalar(angularSpeed), 0.18);
-        } else {
-          angVel.multiplyScalar(0.9);
-        }
+          const speed = tmpVel.length();
 
-        // apply rotation
-        const angle = angVel.length() * PHYSICS_STEP;
-        if (angle > 0.0001) {
-          obj.rotateOnAxis(angVel.clone().normalize(), angle);
+          if (speed > 0.01) {
+            tmpAxis.crossVectors(tmpVel, up).normalize();
+
+            const radius = s * (physics.config.colliderScale ?? 0.65);
+            const angularSpeed = speed / Math.max(radius, 0.001);
+
+            angVel.lerp(tmpAxis.multiplyScalar(angularSpeed), 0.18);
+          } else {
+            angVel.multiplyScalar(0.9);
+          }
+
+          const angle = angVel.length() * PHYSICS_STEP;
+          if (angle > 0.0001) {
+            obj.rotateOnAxis(angVel.clone().normalize(), angle);
+          }
         }
+        // MOBILE → tidak ada rotasi sama sekali
       }
 
       accumulator -= PHYSICS_STEP;
