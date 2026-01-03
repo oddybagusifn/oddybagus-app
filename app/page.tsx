@@ -8,7 +8,7 @@ import BuildsSection from "@/components/BuildsSection";
 import StackSpotlightGrid from "@/components/StackSpotlightGrid";
 import MarqueeVierre from "@/components/MarqueeVierre";
 import RevealSwipeFM from "@/components/RevealSwipeFM";
-// import HeadBustCanvas from "@/components/HeadBustCanvas";
+import HeadBustCanvas from "@/components/HeadBustCanvas";
 import Ballpit from "@/components/Ballpit";
 import SlideInOnScroll from "@/components/SlideInOnScroll";
 import TrackWavePlayer, { Track } from "@/components/TrackWavePlayer";
@@ -106,7 +106,7 @@ export default function Home() {
           {/* BALLPIT SEBAGAI BACKGROUND FULL 100VH */}
           <Ballpit
             className="absolute inset-0 -z-10 h-full w-full"
-            count={90}
+            count={1}
             gravity={0.1}
             friction={2}
             wallBounce={0.1}
@@ -168,6 +168,8 @@ export default function Home() {
               create expressive digital experiences. I help brands and creators
               bring ideas to life through code, design, and sound.
             </ScrollReveal>
+            
+            <HeadBustCanvas/>
           </div>
         </div>
       </div>
