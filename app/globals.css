@@ -418,18 +418,6 @@ body {
 }
 
 
-/* 🔒 Disable custom cursor on touch devices */
-@media (pointer: coarse) {
-  .vierre-dot {
-    display: none !important;
-  }
-
-  html.has-vierre-dot {
-    cursor: auto !important;
-  }
-}
-
-
 
 
 

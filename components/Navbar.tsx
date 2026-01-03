@@ -73,7 +73,6 @@ function IconBurstToggle() {
       onClick={toggle}
       className="relative w-8 h-8 overflow-visible"
     >
-
       <style jsx>{`
         .burst .dot {
           transform: translate(-50%, -50%) rotate(var(--angle)) translateY(0);
@@ -149,6 +148,15 @@ export default function Navbar() {
     const center = rect.left - ulRect.left + rect.width / 2;
     setIndicatorCenter(center);
   };
+
+  useEffect(() => {
+    if (!open) return;
+
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
 
   useEffect(() => {
     const obs = new IntersectionObserver(
@@ -310,18 +318,22 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* ✅ Mobile NAV dropdown (tetap sama) */}
+      {/* ✅ Mobile NAV fullscreen overlay */}
       <div
-        className={`md:hidden overflow-hidden border-b border-[#ebebeb]
-        bg-[rgba(230,230,230,0.6)] backdrop-blur-md supports-[backdrop-filter]:backdrop-blur-md
-        transition-[max-height,opacity,transform] duration-500 ease-[cubic-bezier(.22,1,.36,1)]
-        ${
-          open
-            ? "max-h-96 opacity-100 translate-y-0"
-            : "max-h-0 opacity-0 -translate-y-1"
-        }`}
+        className={`md:hidden fixed inset-0 z-40
+  bg-[rgba(230,230,230,0)]
+  backdrop-blur-xl supports-[backdrop-filter]:backdrop-blur-xl
+  transition-[opacity,transform] duration-500 ease-[cubic-bezier(.22,1,.36,1)]
+  ${
+    open
+      ? "opacity-100 translate-y-0 pointer-events-auto"
+      : "opacity-0 -translate-y-4 pointer-events-none"
+  }`}
       >
-        <div className={`${CONTAINER} px-6 py-6`}>
+        <div
+          className={`${CONTAINER} h-full px-6
+  flex items-center justify-center`}
+        >
           <ul className="flex flex-col items-center gap-6">
             {NAV.map((label, i) => {
               const isActive = active === label;
