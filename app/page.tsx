@@ -10,7 +10,6 @@ import MarqueeVierre from "@/components/MarqueeVierre";
 import RevealSwipeFM from "@/components/RevealSwipeFM";
 // import HeadBustCanvas from "@/components/HeadBustCanvas";
 // import Ballpit from "@/components/Ballpit";
-import ScrambledText from "@/components/ScrambledText";
 import SlideInOnScroll from "@/components/SlideInOnScroll";
 import TrackWavePlayer, { Track } from "@/components/TrackWavePlayer";
 import FloatingMiniPlayer from "@/components/FloatingMiniPlayer";
@@ -161,28 +160,14 @@ export default function Home() {
         w-full
       "
           >
-            {/* TEXT + animasi scroll */}
-            <SlideInOnScroll distance={400} delay={0.0}>
-              <ScrambledText
-                className="scrambled-text-demo"
-                radius={100}
-                duration={1.2}
-                speed={0.5}
-                scrambleChars=".:"
-              >
-                Hi, I am <span>Oddy Bagus</span> 👋 I build modern, fast, and
-                aesthetic websites through fullstack development and thoughtful
-                design. I also produce music ♪ blending sound and technology to
-                create expressive digital experiences. I help brands and
-                creators bring ideas to life through code, design, and sound.
-              </ScrambledText>
-            </SlideInOnScroll>
-
-            <SlideInOnScroll distance={400} delay={0.2}>
-              <div className="flex justify-end">
-                {/* <HeadBustCanvas /> */}
-              </div>
-            </SlideInOnScroll>
+            <ScrollReveal
+            >
+              Hi, I am Oddy Bagus👋 I build modern, fast, and
+              aesthetic websites through fullstack development and thoughtful
+              design. I also produce music ♪ blending sound and technology to
+              create expressive digital experiences. I help brands and creators
+              bring ideas to life through code, design, and sound.
+            </ScrollReveal>
           </div>
         </div>
       </div>

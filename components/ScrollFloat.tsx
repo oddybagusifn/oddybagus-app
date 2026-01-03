@@ -64,10 +64,14 @@ export default function ScrollFloat({
       }
     }
 
+    
+
     const chars = el.querySelectorAll<HTMLSpanElement>(".char");
     if (!chars.length) return;
 
     const ctx = gsap.context(() => {
+      el.classList.add("in-view");
+
       // ✨ FLOAT + SCRUB (scroll)
       gsap.fromTo(
         chars,
@@ -113,10 +117,7 @@ export default function ScrollFloat({
   }, [animationDuration, ease, scrollStart, scrollEnd, stagger]);
 
   return (
-    <span
-      ref={wrapRef}
-      className={`inline-block will-change-transform scroll-float-text ${className}`}
-    >
+    <span ref={wrapRef} className={`float-wrapper ${className}`}>
       {children}
     </span>
   );

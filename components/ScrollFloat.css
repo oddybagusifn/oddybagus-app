@@ -1,17 +1,47 @@
-.scroll-float {
-  overflow: hidden;
+.float-wrapper {
+  display: inline-block;
+  font-size: clamp(1.4rem, 5vw, 4rem);
+  font-weight: 800;
+  line-height: 1.4;
 }
 
-.scroll-float-text {
+.float-char {
   display: inline-block;
-  font-size: clamp(1.25rem, 6vw, 4rem);
-  font-weight: 900;
-  text-align: center;
-  line-height: 1.5;
+  opacity: 0;
+  transform: translateY(40px) scale(0.9);
+  filter: blur(6px);
+
+  background: linear-gradient(
+    120deg,
+    #ff6bcb,
+    #feca57,
+    #54a0ff,
+    #5f27cd,
+    #1dd1a1
+  );
+  background-size: 300% 300%;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  transition:
+    transform 0.8s ease,
+    opacity 0.8s ease,
+    filter 0.8s ease;
 }
 
-/* Base char */
-.char {
-  display: inline-block;
-  will-change: transform, background-position;
+/* active */
+.float-wrapper.in-view .float-char {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+  animation: gradientMove 6s ease-in-out infinite;
+}
+
+@keyframes gradientMove {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
 }
