@@ -7,14 +7,21 @@ export default function CursorVierre() {
   const mounted = useRef(false);
 
   useEffect(() => {
-    if (mounted.current) return; // guard for React StrictMode double-mount
+    // ❌ Jangan jalan di device touch
+    if (
+      typeof window !== "undefined" &&
+      window.matchMedia("(pointer: coarse)").matches
+    ) {
+      return;
+    }
+
+    if (mounted.current) return;
     mounted.current = true;
 
     const html = document.documentElement;
     html.classList.add("has-vierre-dot");
 
     const el = dotRef.current!;
-    // place offscreen until first move
     el.style.setProperty("--vx", "-9999px");
     el.style.setProperty("--vy", "-9999px");
     el.style.opacity = "0";
@@ -24,6 +31,7 @@ export default function CursorVierre() {
       el.style.setProperty("--vy", `${e.clientY}px`);
       el.style.opacity = "1";
     };
+
     const down = () => el.classList.add("is-down");
     const up = () => el.classList.remove("is-down");
     const leave = () => (el.style.opacity = "0");
