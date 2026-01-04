@@ -65,40 +65,34 @@ export default function StackSpotlightGrid() {
   };
 
   return (
-    <div className="grid grid-cols-6 gap-12 md:gap-12 w-full">
-      {/* Stacks grid — keep it aligned to left of the container */}
-      <div className="col-span-12 lg:col-span-12">
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 gap-8 md:gap-10 items-start">
-          {skills.map(({ slug, name, Icon }) => (
-            <Link key={slug} href={`/stack/${slug}`} className="group block">
-              <div className="stack-card">
-                {/* spot-wrapper controls spotlight (CSS vars --mx / --my) */}
-                <div
-                  className="spot-wrapper"
-                  onMouseMove={handleMove}
-                  onMouseLeave={handleLeave}
-                  // init center
-                  style={{ ["--mx" as any]: "50%", ["--my" as any]: "50%" }}
+    <div className="w-full">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8">
+        {skills.map(({ slug, name, Icon }) => (
+          <Link key={slug} href={`/stack/${slug}`} className="group block">
+            <div className="stack-card">
+              <div
+                className="spot-wrapper"
+                onMouseMove={handleMove}
+                onMouseLeave={handleLeave}
+                style={{ ["--mx" as any]: "50%", ["--my" as any]: "50%" }}
+              >
+                <SpotlightCard
+                  className="custom-spotlight-card"
+                  spotlightColor="rgba(230,230,230,.28)"
                 >
-                  <SpotlightCard
-                    className="custom-spotlight-card"
-                    spotlightColor="rgba(230,230,230,.28)"
-                  >
-                    <div className="flex flex-col items-center justify-center py-6 px-3">
-                      <Icon size={56} color="#ebebeb" />
-                      <div className="mt-3 text-center text-[#ebebeb] font-extrabold tracking-tight text-sm">
-                        {name}
-                      </div>
+                  <div className="flex flex-col items-center justify-center py-6 px-3">
+                    <Icon size={56} color="#ebebeb" />
+                    <div className="mt-3 text-center text-[#ebebeb] font-extrabold tracking-tight text-sm">
+                      {name}
                     </div>
-                  </SpotlightCard>
-                </div>
+                  </div>
+                </SpotlightCard>
               </div>
-            </Link>
-          ))}
-        </div>
-      </div>
+            </div>
+          </Link>
+        ))}
 
-      <style jsx>{`
+        <style jsx>{`
         .stack-card {
           perspective: 1000px;
         }
@@ -168,6 +162,7 @@ export default function StackSpotlightGrid() {
           }
         }
       `}</style>
+      </div>
     </div>
   );
 }

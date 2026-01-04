@@ -104,6 +104,7 @@ function HeadModel() {
     <group
       ref={group}
       scale={4.2}
+      position={[0.30, 0, 0]} // 👈 geser halus ke kanan
       onPointerOver={onPointerOver}
       onPointerOut={onPointerOut}
       onPointerDown={onPointerDown}
@@ -123,7 +124,14 @@ export default function HeadBustCanvas() {
 
   return (
     <div className="w-full flex justify-center items-center">
-      <div className="w-[550px] h-[550px] sm:w-[620px] sm:h-[620px]">
+      <div className="
+  w-full
+  max-w-[320px]
+  sm:max-w-[420px]
+  md:max-w-[520px]
+  aspect-square
+  flex justify-center items-center
+">
         <Canvas
           shadows
           camera={{ position: [0, 0.3, 3.1], fov: 32 }}

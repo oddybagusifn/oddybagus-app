@@ -99,7 +99,7 @@ const stack = skills.map((label) => ({ content: label }));
 
 export default function Home() {
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen w-full overflow-x-hidden">
       {/* ===== HEADER: Navbar + Hero + Particles (full width) ===== */}
       <header className="relative isolate w-full">
         <section className="relative flex min-h-screen items-center justify-center overflow-hidden">
@@ -168,8 +168,10 @@ export default function Home() {
               create expressive digital experiences. I help brands and creators
               bring ideas to life through code, design, and sound.
             </ScrollReveal>
-            
-            <HeadBustCanvas/>
+
+            <div className="relative w-full grid place-items-center md:flex md:justify-end">
+              <HeadBustCanvas />
+            </div>
           </div>
         </div>
       </div>
@@ -179,7 +181,9 @@ export default function Home() {
         <div className="mx-auto max-w-[1600px]">
           {/* Title block */}
           <div className="py-10 md:py-14 ">
-            <h1 className="text-[36px] md:text-[44px] font-extrabold tracking-[.08em]">
+            <h1 className="text-[28px] sm:text-[32px] md:text-[44px] 
+               font-extrabold tracking-[.04em] sm:tracking-[.06em] md:tracking-[.08em]
+               break-words">
               <ScrollFloat
                 animationDuration={1}
                 ease="back.inOut(3)"
@@ -200,7 +204,7 @@ export default function Home() {
         </div>
 
         {/* ===== Marquee with reveal ===== */}
-        <div className="relative py-16 text-[#ebebeb] ">
+        <div className="relative py-16 text-[#ebebeb] overflow-hidden w-full">
           <RevealSwipeFM direction="up" delay={0.1} duration={0.5}>
             <MarqueeVierre text="VIERRE." repeat={22} duration={24} />
           </RevealSwipeFM>
@@ -255,55 +259,31 @@ export default function Home() {
       {/* ===== Stack ===== */}
       <section id="stack" className="px-4 sm:px-6 py-16">
         <div className="mx-auto max-w-[1600px]">
-          <div className="py-10 md:py-14">
-            <h1 className="text-[36px] md:text-[44px] font-extrabold tracking-[.08em]">
-              <ScrollFloat
-                animationDuration={1}
-                ease="back.inOut(3)"
-                scrollStart="center bottom+=50%"
-                scrollEnd="bottom bottom-=40%"
-                stagger={0.03}
-              >
-                WHAT I USE?
-              </ScrollFloat>
-            </h1>
-            <p className="mt-2 text-sm sm:text-base text-[#ebebeb]/70 max-w-2xl">
-              Tools that I work with.
-            </p>
-          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
 
-          {/* Replace your previous wrapper with this */}
-          <div className="w-full">
-            <div className="max-w-full">
-              <div className="flex flex-col md:flex-row items-center md:items-center gap-24 md:gap-24">
-                {/* LEFT: Stacks (menempel ke kiri pada container) */}
-                <div className="w-full md:w 2/3">
-                  {/* ensure the grid inside StackSpotlightGrid does not center itself */}
-                  <div className="pl">
-                    <StackSpotlightGrid />
-                  </div>
-                </div>
+            {/* LEFT — STACK */}
+            <div className="w-full flex justify-center md:justify-start">
+              <StackSpotlightGrid />
+            </div>
 
-                {/* RIGHT: Arrow + Text */}
-                <div className="w-full md:w-2/3 flex items-center justify-center">
-                  <div className="flex flex-col md:flex-row items-center justify-center md:items-center gap-4 md:gap-6">
-                    {/* Text block - arrow is aligned center horizontally with this block */}
-                    <div className="text-center md:text-left w-full">
-                      <p className="text-md text-[#ebebeb] leading-relaxed">
-                        These are the stacks and tools I frequently use to build
-                        modern, production-ready applications. From backend
-                        systems and REST APIs to frontend interfaces, game
-                        prototypes and music production workflows these tools
-                        help me move fast while keeping results polished and
-                        professional.
-                      </p>
-                    </div>
-                  </div>
-                </div>
+            {/* RIGHT — TEXT */}
+            <div className="w-full flex items-start md:items-center justify-center md:justify-start">
+              <div className="max-w-xl text-center md:text-left">
+                <p className="text-md text-[#ebebeb] leading-relaxed">
+                  These are the stacks and tools I frequently use to build
+                  modern, production-ready applications. From backend
+                  systems and REST APIs to frontend interfaces, game
+                  prototypes and music production workflows these tools
+                  help me move fast while keeping results polished and
+                  professional.
+                </p>
               </div>
             </div>
+
+
           </div>
         </div>
+
       </section>
 
       <section id="contact" className="px-4 sm:px-6 py-16">
@@ -311,7 +291,16 @@ export default function Home() {
           <div className="grid md:grid-cols-2 gap-16 items-center">
             {/* LEFT - TEXT & FORM */}
             <div>
-              <h1 className="text-[36px] md:text-[44px] font-extrabold tracking-[.08em]">
+              <h1 className="
+  text-[28px]
+  sm:text-[32px]
+  md:text-[44px]
+  font-extrabold
+  tracking-[.04em]
+  sm:tracking-[.06em]
+  break-words
+">
+
                 <ScrollFloat
                   animationDuration={1}
                   ease="back.inOut(3)"

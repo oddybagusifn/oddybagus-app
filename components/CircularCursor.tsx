@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function CircularCursor() {
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -10,13 +10,39 @@ export default function CircularCursor() {
   const pos = useRef({ x: 0, y: 0 });
   const rotation = useRef(0);
 
+  const [isDesktop, setIsDesktop] = useState(false);
+
+  /* ===============================
+     DETECT DESKTOP ONLY
+  =============================== */
   useEffect(() => {
+    const checkDevice = () => {
+      const hasFinePointer = window.matchMedia("(pointer: fine)").matches;
+      const isWideScreen = window.innerWidth >= 768;
+
+      setIsDesktop(hasFinePointer && isWideScreen);
+    };
+
+    checkDevice();
+    window.addEventListener("resize", checkDevice);
+
+    return () => window.removeEventListener("resize", checkDevice);
+  }, []);
+
+  /* ===============================
+     CURSOR LOGIC (DESKTOP ONLY)
+  =============================== */
+  useEffect(() => {
+    if (!isDesktop) return;
+
     const move = (e: MouseEvent) => {
       mouse.current.x = e.clientX;
       mouse.current.y = e.clientY;
     };
 
     window.addEventListener("mousemove", move);
+
+    let rafId: number;
 
     const animate = () => {
       if (!wrapperRef.current || !svgRef.current) return;
@@ -25,7 +51,7 @@ export default function CircularCursor() {
       pos.current.x += (mouse.current.x - pos.current.x) * 0.2;
       pos.current.y += (mouse.current.y - pos.current.y) * 0.2;
 
-      // center wrapper exactly on cursor
+      // center cursor
       wrapperRef.current.style.transform = `
         translate(${pos.current.x}px, ${pos.current.y}px)
       `;
@@ -36,12 +62,21 @@ export default function CircularCursor() {
         translate(-50%, -50%) rotate(${rotation.current}deg)
       `;
 
-      requestAnimationFrame(animate);
+      rafId = requestAnimationFrame(animate);
     };
 
     animate();
-    return () => window.removeEventListener("mousemove", move);
-  }, []);
+
+    return () => {
+      window.removeEventListener("mousemove", move);
+      cancelAnimationFrame(rafId);
+    };
+  }, [isDesktop]);
+
+  /* ===============================
+     HIDE ON MOBILE
+  =============================== */
+  if (!isDesktop) return null;
 
   return (
     <div ref={wrapperRef} className="circular-cursor">
