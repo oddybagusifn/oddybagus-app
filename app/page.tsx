@@ -24,24 +24,28 @@ const projects = [
     title: "Vierre App",
     tag: "Next JS / Tailwind CSS",
     cover: "/vierre_app.PNG",
+    href: "https://vierre.vercel.app"
   },
   {
     id: "p2",
     title: "Ngode",
     tag: "Laravel / Bootstrap 5",
     cover: "/ngode.PNG",
+    href: "https://ngode.laravel.cloud/"
   },
   {
     id: "p3",
     title: "Honda Mobil Purwokerto",
     tag: "Laravel",
     cover: "/honda.svg",
+    href: "https://hondamobilpurwokerto.laravel.cloud/"
   },
   {
     id: "p4",
     title: "Super Hood",
     tag: "Unity 2D / C#",
     cover: "/superhood.PNG",
+    href: "https://github.com/oddybagusifn/SuperHood-Unity-Project"
   },
 ];
 

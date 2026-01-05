@@ -248,6 +248,7 @@ function BuildRow({ project, index }: { project: Project; index: number }) {
   const ImageCard = (
     <a
       href={project.href ?? "#"}
+      target="_blank"
       aria-label={project.title}
       className={[
         "piece piece-media group/card col-span-6",

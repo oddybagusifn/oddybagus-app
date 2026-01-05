@@ -104,7 +104,7 @@ function HeadModel() {
     <group
       ref={group}
       scale={4.2}
-      position={[0.30, 0, 0]} // 👈 geser halus ke kanan
+      position={[0, 0, 0]} // 👈 geser halus ke kanan
       onPointerOver={onPointerOver}
       onPointerOut={onPointerOut}
       onPointerDown={onPointerDown}
@@ -134,7 +134,7 @@ export default function HeadBustCanvas() {
 ">
         <Canvas
           shadows
-          camera={{ position: [0, 0.3, 3.1], fov: 32 }}
+          camera={{ position: [0, 0.0, 3.1], fov: 0 }}
           gl={{ alpha: true, antialias: true }}
           className="w-full h-full bg-transparent"
           onPointerEnter={() => setCursorActive(true)}
