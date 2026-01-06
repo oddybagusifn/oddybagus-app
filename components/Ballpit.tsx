@@ -134,7 +134,6 @@ class X {
     this.renderer.outputColorSpace = SRGBColorSpace;
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = PCFSoftShadowMap; // soft shadow
-    this.renderer.physicallyCorrectLights = true;
   }
 
   #initObservers() {
@@ -224,24 +223,22 @@ class X {
   }
 
   #updateRenderer() {
-    const maxPixelRatio = isMobile ? 1.25 : 2;
-    this.renderer.setPixelRatio(
-      Math.min(window.devicePixelRatio, maxPixelRatio)
-    );
-
-    this.renderer.setSize(this.size.width, this.size.height);
-    this.#postprocessing?.setSize(this.size.width, this.size.height);
-
     let pr = window.devicePixelRatio;
-    if (this.maxPixelRatio && pr > this.maxPixelRatio) {
-      pr = this.maxPixelRatio;
-    } else if (this.minPixelRatio && pr < this.minPixelRatio) {
-      pr = this.minPixelRatio;
+
+    if (isMobile) {
+      pr = Math.min(pr, 0.85); // 🔥 kunci performa mobile
+    } else {
+      if (this.maxPixelRatio && pr > this.maxPixelRatio) pr = this.maxPixelRatio;
+      if (this.minPixelRatio && pr < this.minPixelRatio) pr = this.minPixelRatio;
     }
 
     this.renderer.setPixelRatio(pr);
+    this.renderer.setSize(this.size.width, this.size.height);
+    this.#postprocessing?.setSize(this.size.width, this.size.height);
+
     this.size.pixelRatio = pr;
   }
+
 
   get postprocessing() {
     return this.#postprocessing;
@@ -267,10 +264,8 @@ class X {
 
     const animateFrame = () => {
       this.#animationFrameId = requestAnimationFrame(animateFrame);
-
       this.#animationState.delta = this.#clock.getDelta();
       this.#animationState.elapsed += this.#animationState.delta;
-
       this.onBeforeRender(this.#animationState);
       this.render();
       this.onAfterRender(this.#animationState);
@@ -280,7 +275,6 @@ class X {
     this.#clock.start();
     animateFrame();
   }
-
 
   #stopAnimation() {
     if (this.#isVisible) {
@@ -423,8 +417,9 @@ class W {
       const pos = new Vector3().fromArray(positionData, base);
       const vel = new Vector3().fromArray(velocityData, base);
       const radius = sizeData[idx] * colliderScale;
+      const maxCheck = isMobile ? Math.min(config.count, idx + 8) : config.count;
 
-      for (let jdx = idx + 1; jdx < config.count; jdx++) {
+      for (let jdx = idx + 1; jdx < maxCheck; jdx++) {
         const otherBase = 3 * jdx;
         const otherPos = new Vector3().fromArray(positionData, otherBase);
         const otherVel = new Vector3().fromArray(velocityData, otherBase);
@@ -837,11 +832,12 @@ async function createBallpit(
   keyLight.shadow.bias = -0.0005;
 
   let cursorLight: PointLight | null = null;
-
   if (!isMobile) {
     cursorLight = new PointLight(0xffffff, 12, 100, 0.3);
     cursorLight.position.set(0, 0, 8);
-    cursorLight.castShadow = false;
+    cursorLight.castShadow = true;
+    cursorLight.shadow.mapSize.set(1024, 1024);
+    cursorLight.shadow.radius = 2.0;
     threeInstance.scene.add(cursorLight);
   }
 
@@ -854,6 +850,9 @@ async function createBallpit(
   ground.receiveShadow = true;
   ground.rotation.x = -Math.PI / 2;
   ground.position.y = -0.01;
+  if (isMobile) {
+    ground.visible = false;
+  }
   threeInstance.scene.add(ground);
 
   // load GLB baymax
@@ -974,35 +973,35 @@ async function createBallpit(
 
   const raycaster = new Raycaster();
   const plane = new Plane(new Vector3(0, 0, 1), 0);
+
   const intersectionPoint = new Vector3();
   let isPaused = false;
 
   canvas.style.touchAction = "none";
   canvas.style.userSelect = "none";
-  if (isMobile) {
-    canvas.style.pointerEvents = "none";
-  }
-
   (canvas.style as any).webkitUserSelect = "none";
 
-  let pointerData: any = null;
+  let pointerData: PointerData | null = null;
 
   if (!isMobile && config.followCursor !== false) {
     pointerData = createPointerData({
       domElement: canvas,
       onMove() {
-        raycaster.setFromCamera(pointerData.nPosition, threeInstance.camera);
-        threeInstance.camera.getWorldDirection(plane.normal);
+        raycaster.setFromCamera(pointerData!.nPosition, threeInstance.camera);
         raycaster.ray.intersectPlane(plane, intersectionPoint);
 
         physics.center.copy(intersectionPoint);
         physics.config.controlSphere0 = true;
 
-        cursorLight.position.copy(intersectionPoint).setZ(8);
+        if (cursorLight) {
+          cursorLight.position.copy(intersectionPoint).setZ(8);
+        }
       },
       onLeave() {
         physics.config.controlSphere0 = false;
       },
+      onClick() { },
+      onEnter() { },
     });
   }
 
@@ -1024,6 +1023,10 @@ async function createBallpit(
     let steps = 0;
 
     while (accumulator >= PHYSICS_STEP && steps < MAX_STEPS) {
+      if (isMobile) {
+        physics.config.controlSphere0 = false;
+      }
+
       physics.update({ delta: PHYSICS_STEP });
 
       for (let i = 0; i < baymaxes.length; i++) {
@@ -1042,14 +1045,11 @@ async function createBallpit(
         const angVel = angularVelocity[i];
 
         // --- rotational impulse ---
-        if (!isMobile) {
-          tmpImpulse.set(
-            physics.collisionImpulseData[base],
-            physics.collisionImpulseData[base + 1],
-            physics.collisionImpulseData[base + 2]
-          );
-        }
-
+        tmpImpulse.set(
+          physics.collisionImpulseData[base],
+          physics.collisionImpulseData[base + 1],
+          physics.collisionImpulseData[base + 2]
+        );
 
         const impulseLen = tmpImpulse.length();
         if (impulseLen > 0.0001) {
@@ -1110,6 +1110,7 @@ async function createBallpit(
     const groundWidth = physics.config.maxX * 2;
     ground.scale.set(groundWidth, groundWidth, 1);
     ground.position.set(0, -physics.config.maxY + worldYOffset, 0);
+
   };
 
   return {
@@ -1119,7 +1120,9 @@ async function createBallpit(
       isPaused = !isPaused;
     },
     dispose() {
-      pointerData.dispose?.();
+      if (pointerData) {
+        pointerData.dispose?.();
+      }
       baymaxes.forEach((o) => threeInstance.scene.remove(o));
       threeInstance.scene.remove(ground);
       ground.geometry.dispose();
@@ -1179,3 +1182,5 @@ const Ballpit: React.FC<BallpitProps> = (props) => {
 };
 
 export default Ballpit;
+
+
