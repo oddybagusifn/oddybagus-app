@@ -9,7 +9,7 @@ import StackSpotlightGrid from "@/components/StackSpotlightGrid";
 import MarqueeVierre from "@/components/MarqueeVierre";
 import RevealSwipeFM from "@/components/RevealSwipeFM";
 import HeadBustCanvas from "@/components/HeadBustCanvas";
-// import Ballpit from "@/components/Ballpit";
+import Ballpit from "@/components/Ballpit";
 import SlideInOnScroll from "@/components/SlideInOnScroll";
 import TrackWavePlayer, { Track } from "@/components/TrackWavePlayer";
 import FloatingMiniPlayer from "@/components/FloatingMiniPlayer";
@@ -108,14 +108,14 @@ export default function Home() {
       <header className="relative isolate w-full">
         <section className="relative flex min-h-screen items-center justify-center overflow-hidden">
           {/* BALLPIT SEBAGAI BACKGROUND FULL 100VH */}
-          {/* <Ballpit
+          <Ballpit
             className="absolute inset-0 -z-10 h-full w-full"
-            count={1}
+            count={90}
             gravity={0.1}
             friction={2}
             wallBounce={0.1}
             followCursor={false}
-          /> */}
+          />
 
           {/* HERO TEXT DI ATAS BALLPIT */}
           <div className="relative z-10 max-w-[1600px] w-full px-4 sm:px-6 mx-auto text-center">
