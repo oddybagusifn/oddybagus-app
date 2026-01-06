@@ -102,6 +102,10 @@ const skills = [
 const stack = skills.map((label) => ({ content: label }));
 
 export default function Home() {
+  const isMobile =
+    typeof window !== "undefined" &&
+    /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
   return (
     <main className="min-h-screen w-full overflow-x-hidden">
       {/* ===== HEADER: Navbar + Hero + Particles (full width) ===== */}
@@ -110,7 +114,7 @@ export default function Home() {
           {/* BALLPIT SEBAGAI BACKGROUND FULL 100VH */}
           <Ballpit
             className="absolute inset-0 -z-10 h-full w-full"
-            count={20}
+            count={isMobile ? 20 : 90}
             gravity={0.1}
             friction={2}
             wallBounce={0.1}

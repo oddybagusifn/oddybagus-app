@@ -800,8 +800,11 @@ async function createBallpit(
     rendererOptions: { antialias: true, alpha: true },
   });
 
-  threeInstance.renderer.shadowMap.enabled = !isMobile;
-  threeInstance.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  threeInstance.renderer.shadowMap.enabled = true;
+  threeInstance.renderer.shadowMap.type = isMobile
+    ? THREE.BasicShadowMap   // 🔥 paling ringan
+    : THREE.PCFSoftShadowMap;
+
 
   threeInstance.renderer.toneMapping = ACESFilmicToneMapping;
   threeInstance.renderer.toneMappingExposure = 1.5;
@@ -811,18 +814,43 @@ async function createBallpit(
   threeInstance.resize();
 
   // lights
-  const ambient = new AmbientLight(0xffffff, 0.9);
+  const ambient = new AmbientLight(
+    0xffffff,
+    isMobile ? 1.6 : 0.9 // 🔥 lebih terang di mobile
+  );
+
+
   const keyLight = new PointLight(0xffffff, 10, 80, 1);
   const mainLight = new PointLight(0xffffff, 1.2);
 
   mainLight.position.set(0, 10, 10);
-  mainLight.castShadow = !isMobile;
-  mainLight.shadow.mapSize.set(512, 512); // ringan tapi halus
-  mainLight.shadow.bias = -0.0005;
-  mainLight.shadow.normalBias = 0.02;
-  mainLight.shadow.radius = 5;
+  mainLight.castShadow = true;
 
-  const fillLight = new PointLight(0xffffff, 18, 120, 1);
+
+  if (isMobile) {
+    mainLight.intensity = 2.4;            // 🔥 KONTRAS SHADOW NAIK
+    mainLight.position.set(1.5, 11, 7);   // 🔥 sudut shadow bagus
+    mainLight.shadow.mapSize.set(256, 256);
+    mainLight.shadow.bias = -0.004;       // 🔥 bikin shadow “nempel”
+    mainLight.shadow.normalBias = 0.035;
+  } else {
+    mainLight.intensity = 1.2;
+    mainLight.shadow.mapSize.set(512, 512);
+    mainLight.shadow.bias = -0.0005;
+    mainLight.shadow.normalBias = 0.02;
+    mainLight.shadow.radius = 5;
+  }
+
+  mainLight.shadow.normalBias = 0.025;
+
+
+  const fillLight = new PointLight(
+    0xffffff,
+    isMobile ? 6 : 18,
+    120,
+    1
+  );
+
   fillLight.position.set(-24, 10, 10);
   fillLight.castShadow = false;
 
@@ -844,15 +872,15 @@ async function createBallpit(
   threeInstance.scene.add(ambient, mainLight, fillLight);
 
   // ground plane untuk shadow
-  const groundMat = new ShadowMaterial({ opacity: 0.4 });
+  const groundMat = new ShadowMaterial({
+    opacity: isMobile ? 0.15 : 0.4, // 🔥 sangat tipis di mobile
+  });
+
   const groundGeo = new PlaneGeometry(20, 20);
   const ground = new Mesh(groundGeo, groundMat);
   ground.receiveShadow = true;
   ground.rotation.x = -Math.PI / 2;
   ground.position.y = -0.01;
-  if (isMobile) {
-    ground.visible = false;
-  }
   threeInstance.scene.add(ground);
 
   // load GLB baymax
@@ -862,8 +890,8 @@ async function createBallpit(
 
   baseModel.traverse((child) => {
     if ((child as THREE.Mesh).isMesh) {
-      child.castShadow = !isMobile;
-      child.receiveShadow = !isMobile;
+      child.castShadow = true;
+      child.receiveShadow = true;
     }
   });
 
