@@ -117,7 +117,7 @@ export default function Home() {
             count={isMobile ? 20 : 90}
             gravity={isMobile ? 0.5 : 0.1}
             friction={2}
-            wallBounce={0.1}
+            wallBounce={0.3}
             followCursor={false}
           />
 

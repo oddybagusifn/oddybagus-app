@@ -226,7 +226,7 @@ class X {
     let pr = window.devicePixelRatio;
 
     if (isMobile) {
-      pr = Math.min(pr, 0.85); // 🔥 kunci performa mobile
+      pr = Math.min(pr, 1.0);
     } else {
       if (this.maxPixelRatio && pr > this.maxPixelRatio) pr = this.maxPixelRatio;
       if (this.minPixelRatio && pr < this.minPixelRatio) pr = this.minPixelRatio;
@@ -828,7 +828,7 @@ async function createBallpit(
 
   const sculptLight = new PointLight(0xffffff, isMobile ? 1.2 : 2.5, 40, 2);
   sculptLight.position.set(-2.5, 6, -3.5); // 🔥 dari belakang samping
-  sculptLight.castShadow = true;
+  sculptLight.castShadow = !isMobile; // 🔥 mobile NO self-shadow
 
   sculptLight.shadow.mapSize.set(isMobile ? 256 : 512, isMobile ? 256 : 512);
   sculptLight.shadow.bias = -0.005;
@@ -844,8 +844,9 @@ async function createBallpit(
     mainLight.distance = 25;                 // 🔥 fokus area kecil
     mainLight.decay = 2;                     // falloff realistis
 
-    mainLight.shadow.mapSize.set(256, 256);
-    mainLight.shadow.bias = -0.0065;         // shadow nempel
+    mainLight.shadow.mapSize.set(128, 128);
+    mainLight.shadow.bias = -0.002;
+    mainLight.shadow.normalBias = 0.06;         // shadow nempel
   }
   else {
     mainLight.intensity = 1.2;
@@ -854,9 +855,6 @@ async function createBallpit(
     mainLight.shadow.normalBias = 0.02;
     mainLight.shadow.radius = 5;
   }
-
-  mainLight.shadow.normalBias = 0.025;
-
 
   const fillLight = new PointLight(
     0xffffff,
@@ -887,7 +885,7 @@ async function createBallpit(
 
   // ground plane untuk shadow
   const groundMat = new ShadowMaterial({
-    opacity: isMobile ? 0.15 : 0.4, // 🔥 sangat tipis di mobile
+    opacity: isMobile ? 0.05 : 0.4, // 
   });
 
   const groundGeo = new PlaneGeometry(20, 20);
