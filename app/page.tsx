@@ -115,7 +115,7 @@ export default function Home() {
           <Ballpit
             className="absolute inset-0 -z-10 h-full w-full"
             count={isMobile ? 20 : 90}
-            gravity={0.1}
+            gravity={isMobile ? 0.5 : 0.1}
             friction={2}
             wallBounce={0.1}
             followCursor={false}

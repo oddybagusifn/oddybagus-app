@@ -826,14 +826,28 @@ async function createBallpit(
   mainLight.position.set(0, 10, 10);
   mainLight.castShadow = true;
 
+  const sculptLight = new PointLight(0xffffff, isMobile ? 1.2 : 2.5, 40, 2);
+  sculptLight.position.set(-2.5, 6, -3.5); // 🔥 dari belakang samping
+  sculptLight.castShadow = true;
+
+  sculptLight.shadow.mapSize.set(isMobile ? 256 : 512, isMobile ? 256 : 512);
+  sculptLight.shadow.bias = -0.005;
+  sculptLight.shadow.normalBias = 0.04;
+
+  threeInstance.scene.add(sculptLight);
+
+
 
   if (isMobile) {
-    mainLight.intensity = 2.4;            // 🔥 KONTRAS SHADOW NAIK
-    mainLight.position.set(1.5, 11, 7);   // 🔥 sudut shadow bagus
+    mainLight.intensity = 3.4;               // 🔥 terang & kontras
+    mainLight.position.set(2.5, 6.5, 6);
+    mainLight.distance = 25;                 // 🔥 fokus area kecil
+    mainLight.decay = 2;                     // falloff realistis
+
     mainLight.shadow.mapSize.set(256, 256);
-    mainLight.shadow.bias = -0.004;       // 🔥 bikin shadow “nempel”
-    mainLight.shadow.normalBias = 0.035;
-  } else {
+    mainLight.shadow.bias = -0.0065;         // shadow nempel
+  }
+  else {
     mainLight.intensity = 1.2;
     mainLight.shadow.mapSize.set(512, 512);
     mainLight.shadow.bias = -0.0005;
@@ -1089,7 +1103,7 @@ async function createBallpit(
         }
 
         // --- rolling rotation ---
-        if (!isMobile) {
+        {
           tmpVel.set(
             physics.velocityData[base],
             physics.velocityData[base + 1],
@@ -1098,23 +1112,35 @@ async function createBallpit(
 
           const speed = tmpVel.length();
 
-          if (speed > 0.01) {
+          // ⚙️ parameter berbeda desktop vs mobile
+          const ROT_LERP = isMobile ? 0.08 : 0.18;
+          const ROT_DAMP = isMobile ? 0.92 : 0.9;
+          const MIN_SPEED = isMobile ? 0.04 : 0.01;
+
+          if (speed > MIN_SPEED) {
             tmpAxis.crossVectors(tmpVel, up).normalize();
 
             const radius = s * (physics.config.colliderScale ?? 0.65);
             const angularSpeed = speed / Math.max(radius, 0.001);
 
-            angVel.lerp(tmpAxis.multiplyScalar(angularSpeed), 0.18);
+            angVel.lerp(
+              tmpAxis.multiplyScalar(angularSpeed),
+              ROT_LERP
+            );
           } else {
-            angVel.multiplyScalar(0.9);
+            angVel.multiplyScalar(ROT_DAMP);
           }
 
           // apply rotation
           const angle = angVel.length() * PHYSICS_STEP;
           if (angle > 0.0001) {
-            obj.rotateOnAxis(angVel.clone().normalize(), angle);
+            obj.rotateOnAxis(
+              angVel.clone().normalize(),
+              angle
+            );
           }
         }
+
       }
 
       accumulator -= PHYSICS_STEP;
