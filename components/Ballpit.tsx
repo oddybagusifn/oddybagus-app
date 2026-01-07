@@ -338,6 +338,8 @@ export interface WConfig {
   maxVelocity: number;
   colliderScale?: number;
   controlSphere0?: boolean;
+  pointerRadius?: number;
+  pointerForce?: number;
 }
 
 class W {
@@ -472,14 +474,23 @@ class W {
 
         if (dist < pointerRadius && dist > 0.0001) {
           const strength = (pointerRadius - dist) / pointerRadius;
-          const push = dir.normalize().multiplyScalar(strength * 6);
-          const velPush = dir
-            .clone()
+
+          // 🔥 falloff kuadrat → lebih responsif dekat cursor
+          const force = strength * strength;
+
+          // dorongan posisi (hindar instan)
+          const push = dir
             .normalize()
-            .multiplyScalar(strength * 10 * deltaInfo.delta);
+            .multiplyScalar(force * 8);
+
+          // impulse ke velocity (tertabrak)
+          const velPush = dir
+            .normalize()
+            .multiplyScalar(force * 18 * deltaInfo.delta);
 
           pos.add(push);
           vel.add(velPush);
+
 
           pos.toArray(positionData, base);
           vel.toArray(velocityData, base);
@@ -1025,7 +1036,7 @@ async function createBallpit(
   }
 
   const raycaster = new Raycaster();
-  const plane = new Plane(new Vector3(0, 0, 1), 0);
+  const plane = new Plane(new Vector3(0, 1, 0), 0);
 
   const intersectionPoint = new Vector3();
   let isPaused = false;
@@ -1040,21 +1051,27 @@ async function createBallpit(
     pointerData = createPointerData({
       domElement: canvas,
       onMove() {
+        // update plane mengikuti arena
+        plane.constant = physics.config.maxY - worldYOffset;
+
         raycaster.setFromCamera(pointerData!.nPosition, threeInstance.camera);
         raycaster.ray.intersectPlane(plane, intersectionPoint);
 
-        physics.center.copy(intersectionPoint);
+        physics.center.set(
+          intersectionPoint.x,
+          intersectionPoint.y - worldYOffset,
+          intersectionPoint.z
+        );
+
         physics.config.controlSphere0 = true;
 
         if (cursorLight) {
-          cursorLight.position.copy(intersectionPoint).setZ(8);
+          cursorLight.position.copy(intersectionPoint).add(new Vector3(0, 2, 4));
         }
       },
       onLeave() {
         physics.config.controlSphere0 = false;
       },
-      onClick() { },
-      onEnter() { },
     });
   }
 
@@ -1071,6 +1088,8 @@ async function createBallpit(
   threeInstance.onBeforeRender = ({ delta }) => {
     if (isPaused) return;
 
+    const safeDelta = Math.min(delta, 0.033); // max ~30fps
+    accumulator += safeDelta;
     accumulator += delta;
 
     let steps = 0;

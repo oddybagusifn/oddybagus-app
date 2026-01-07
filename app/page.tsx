@@ -114,10 +114,10 @@ export default function Home() {
           {/* BALLPIT SEBAGAI BACKGROUND FULL 100VH */}
           <Ballpit
             className="absolute inset-0 -z-10 h-full w-full"
-            count={isMobile ? 20 : 90}
-            gravity={isMobile ? 0.5 : 0.1}
-            friction={2}
-            wallBounce={0.3}
+            count={isMobile ? 20 : 150}
+            gravity={isMobile ? 0.5 : 0.3}
+            friction={1.5}
+            wallBounce={0.15}
             followCursor={false}
           />
 
@@ -326,11 +326,6 @@ export default function Home() {
               </p>
 
               <Contact />
-            </div>
-
-            {/* RIGHT - 3D MODEL */}
-            <div className="relative w-full h-[480px]">
-              {/* <ModelViewer /> */}
             </div>
           </div>
         </div>
