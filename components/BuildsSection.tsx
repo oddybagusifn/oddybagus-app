@@ -228,10 +228,15 @@ function BuildRow({ project, index }: { project: Project; index: number }) {
                   <span
                     key={i}
                     className={[
-                      "px-3 py-1 text-[13px] sm:text-[14px] font-semibold select-none",
+                      "px-3 py-1",
+                      "font-semibold select-none",
                       "border border-[#212121] text-[#ebebeb] bg-transparent",
                       "rounded-full",
-                      "transition-colors hover:bg-[#212121] hover:text-[#e6e6e6]",
+                      "whitespace-nowrap",              // ❌ tidak turun baris
+                      "leading-none",
+                      "text-[clamp(10px,2.6vw,14px)]",  // 🔥 auto shrink
+                      "transition-colors",
+                      "hover:bg-[#212121] hover:text-[#e6e6e6]",
                     ].join(" ")}
                   >
                     {t}

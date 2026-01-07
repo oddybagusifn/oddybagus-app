@@ -16,7 +16,7 @@ import FloatingMiniPlayer from "@/components/FloatingMiniPlayer";
 import TiltedCard from "@/components/TiltedCard";
 import { FiSend } from "react-icons/fi";
 import Contact from "@/components/Contact";
-// import ModelViewer from "@/components/ModelViewer";
+import Footer from "@/components/Footer";
 
 const projects = [
   {
@@ -75,7 +75,7 @@ const tracks: Track[] = [
     artworkUrl: "/artworks/black-out-artwork.png",
     audioUrl: "/audio/blackout.mp3",
     lengthSeconds: 132,
-    genre: "Color Bass / Dubstep",
+    genre: "Color Bass",
   },
   {
     id: "t4",
@@ -356,6 +356,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <Footer/>
     </main>
   );
 }
