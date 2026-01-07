@@ -123,28 +123,54 @@ export default function Home() {
 
           {/* HERO TEXT DI ATAS BALLPIT */}
           <div className="relative z-10 max-w-[1600px] w-full px-4 sm:px-6 mx-auto text-center">
-            <h1 className="text-[48px] md:text-[72px] font-extrabold leading-tight mb-4">
+            <h1 className="
+  text-[28px]
+  sm:text-[36px]
+  md:text-[56px]
+  lg:text-[72px]
+  font-extrabold
+  leading-tight
+  mb-4
+  whitespace-nowrap
+">
+
               <span className="text-transparent align-baseline [-webkit-text-stroke:1px_#ebebeb]">
                 Hello, It’s
               </span>{" "}
               <TextPressure
                 inline
                 text="Vierre"
-                // ✨ gradient colorful
                 gradient
                 gradientColors="linear-gradient(120deg,#ff6bcb,#feca57,#54a0ff,#5f27cd,#1dd1a1,#ff9ff3)"
-                gradientSpeed={10} // lebih besar = animasi lebih pelan
-                textColor="#ebebeb" // fallback kalau gradient mati
+                gradientSpeed={10}
+                textColor="#ebebeb"
                 stroke={false}
                 wghtMin={900}
                 wghtMax={1200}
                 wdthMin={95}
                 wdthMax={180}
-                className="align-baseline"
+                className="
+    align-baseline
+    text-[30px]
+    sm:text-[40px]
+    md:text-[60px]
+    lg:text-[72px]
+  "
               />
+
             </h1>
 
-            <h2 className="text-[28px] md:text-[36px] text-[#ebebeb] font-extrabold tracking-[.08em]">
+            <h2 className="
+  text-[14px]
+  sm:text-[18px]
+  md:text-[28px]
+  lg:text-[36px]
+  text-[#ebebeb]
+  font-extrabold
+  tracking-[.12em]
+  whitespace-nowrap
+">
+
               LET’S BUILD SOMETHING{" "}
               <span className="text-transparent [-webkit-text-stroke:1px_#ebebeb]">
                 DIFFERENT
