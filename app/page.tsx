@@ -296,7 +296,7 @@ export default function Home() {
 
       <section id="contact" className="px-4 sm:px-6 py-16">
         <div className="mx-auto max-w-[1600px]">
-          <div className="grid md:grid-cols-2 gap-16 items-center">
+          <div className="">
             {/* LEFT - TEXT & FORM */}
             <div>
               <h1 className="

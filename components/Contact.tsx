@@ -47,7 +47,15 @@ export default function Contact() {
       <form
         ref={form}
         onSubmit={sendEmail}
-        className="mt-10 space-y-10 max-w-xl"
+        className="
+  mt-10
+  space-y-10
+  w-full
+  sm:w-[70vw]
+  md:w-[50vw]
+  max-w-none
+"
+
       >
         {/* NAME */}
         <div className="relative">
@@ -99,15 +107,13 @@ export default function Contact() {
       {toast.show && (
         <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[9999] animate-pop">
           <div
-            className={`toast-border ${
-              toast.type === "error" ? "toast-error" : "toast-success"
-            }`}
+            className={`toast-border ${toast.type === "error" ? "toast-error" : "toast-success"
+              }`}
           >
             <div className="toast-inner">
               <span
-                className={`toast-text ${
-                  toast.type === "error" ? "text-error" : "text-success"
-                }`}
+                className={`toast-text ${toast.type === "error" ? "text-error" : "text-success"
+                  }`}
               >
                 {toast.message}
               </span>
