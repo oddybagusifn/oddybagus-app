@@ -800,10 +800,12 @@ async function createBallpit(
     rendererOptions: { antialias: true, alpha: true },
   });
 
-  threeInstance.renderer.shadowMap.enabled = true;
-  threeInstance.renderer.shadowMap.type = isMobile
-    ? THREE.BasicShadowMap   // 🔥 paling ringan
-    : THREE.PCFSoftShadowMap;
+  threeInstance.renderer.shadowMap.enabled = !isMobile;
+
+  if (!isMobile) {
+    threeInstance.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  }
+
 
 
   threeInstance.renderer.toneMapping = ACESFilmicToneMapping;
@@ -824,11 +826,18 @@ async function createBallpit(
   const mainLight = new PointLight(0xffffff, 1.2);
 
   mainLight.position.set(0, 10, 10);
-  mainLight.castShadow = true;
+  mainLight.castShadow = !isMobile;
+
+  const fillLight = new PointLight(
+    0xffffff,
+    isMobile ? 6 : 18,
+    120,
+    1
+  );
 
   const sculptLight = new PointLight(0xffffff, isMobile ? 1.2 : 2.5, 40, 2);
   sculptLight.position.set(-2.5, 6, -3.5); // 🔥 dari belakang samping
-  sculptLight.castShadow = !isMobile; // 🔥 mobile NO self-shadow
+  sculptLight.castShadow = false; // selalu false, ini cuma rim
 
   sculptLight.shadow.mapSize.set(isMobile ? 256 : 512, isMobile ? 256 : 512);
   sculptLight.shadow.bias = -0.005;
@@ -839,14 +848,17 @@ async function createBallpit(
 
 
   if (isMobile) {
-    mainLight.intensity = 3.4;               // 🔥 terang & kontras
-    mainLight.position.set(2.5, 6.5, 6);
-    mainLight.distance = 25;                 // 🔥 fokus area kecil
-    mainLight.decay = 2;                     // falloff realistis
+    ambient.intensity = 1.9;
 
-    mainLight.shadow.mapSize.set(128, 128);
-    mainLight.shadow.bias = -0.002;
-    mainLight.shadow.normalBias = 0.06;         // shadow nempel
+    mainLight.intensity = 2.2;
+    mainLight.position.set(2.5, 6, 6);
+    mainLight.distance = 18;
+    mainLight.decay = 2;
+
+    fillLight.intensity = 3.5;
+    fillLight.position.set(-6, 4, 6);
+
+    sculptLight.intensity = 0.8;
   }
   else {
     mainLight.intensity = 1.2;
@@ -856,12 +868,7 @@ async function createBallpit(
     mainLight.shadow.radius = 5;
   }
 
-  const fillLight = new PointLight(
-    0xffffff,
-    isMobile ? 6 : 18,
-    120,
-    1
-  );
+
 
   fillLight.position.set(-24, 10, 10);
   fillLight.castShadow = false;
@@ -884,28 +891,34 @@ async function createBallpit(
   threeInstance.scene.add(ambient, mainLight, fillLight);
 
   // ground plane untuk shadow
-  const groundMat = new ShadowMaterial({
-    opacity: isMobile ? 0.05 : 0.4, // 
-  });
+  // ground plane untuk shadow (DESKTOP ONLY)
+  let ground: Mesh | null = null;
 
-  const groundGeo = new PlaneGeometry(20, 20);
-  const ground = new Mesh(groundGeo, groundMat);
-  ground.receiveShadow = true;
-  ground.rotation.x = -Math.PI / 2;
-  ground.position.y = -0.01;
-  threeInstance.scene.add(ground);
+  if (!isMobile) {
+    const groundMat = new ShadowMaterial({ opacity: 0.4 });
+    const groundGeo = new PlaneGeometry(20, 20);
+
+    ground = new Mesh(groundGeo, groundMat);
+    ground.receiveShadow = true;
+    ground.rotation.x = -Math.PI / 2;
+    ground.position.y = -0.01;
+
+    threeInstance.scene.add(ground);
+  }
+
 
   // load GLB baymax
   const loader = new GLTFLoader();
   const gltf = await loader.loadAsync("/models/baymax.glb");
   const baseModel = gltf.scene;
 
-  baseModel.traverse((child) => {
-    if ((child as THREE.Mesh).isMesh) {
-      child.castShadow = true;
-      child.receiveShadow = true;
+  baseModel.traverse((child: any) => {
+    if (child.isMesh) {
+      child.castShadow = !isMobile;
+      child.receiveShadow = !isMobile;
     }
   });
+
 
 
   // normalisasi base model ke sekitar (0,0,0)
@@ -977,8 +990,8 @@ async function createBallpit(
         mesh.material = applyMat(mesh.material) ?? mesh.material;
       }
 
-      mesh.castShadow = true;
-      mesh.receiveShadow = true;
+      mesh.castShadow = !isMobile;
+      mesh.receiveShadow = !isMobile;
     });
   }
 
@@ -1160,8 +1173,10 @@ async function createBallpit(
     worldYOffset = sizeInfo.wHeight / 2 - physics.config.maxY;
 
     const groundWidth = physics.config.maxX * 2;
-    ground.scale.set(groundWidth, groundWidth, 1);
-    ground.position.set(0, -physics.config.maxY + worldYOffset, 0);
+    if (ground) {
+      ground.scale.set(groundWidth, groundWidth, 1);
+      ground.position.set(0, -physics.config.maxY + worldYOffset, 0);
+    }
 
   };
 
@@ -1176,10 +1191,20 @@ async function createBallpit(
         pointerData.dispose?.();
       }
       baymaxes.forEach((o) => threeInstance.scene.remove(o));
-      threeInstance.scene.remove(ground);
-      ground.geometry.dispose();
-      (ground.material as any).dispose?.();
+
+      if (ground) {
+        threeInstance.scene.remove(ground);
+        ground.geometry.dispose();
+        (ground.material as any).dispose?.();
+      }
       threeInstance.dispose();
+
+      if (ground) {
+        threeInstance.scene.remove(ground);
+        ground.geometry.dispose();
+        (ground.material as any).dispose?.();
+      }
+
     },
   };
 }
