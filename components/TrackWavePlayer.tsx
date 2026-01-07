@@ -4,6 +4,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useLayoutEffect } from "react";
+
 
 const BAR_COUNT = 220;
 const MAX_HEIGHT = 0.9;
@@ -277,66 +279,66 @@ export default function TrackWavePlayer({
   }, [track.id]);
 
   /* ------------ Scroll reveal animation per card (GSAP) ----------- */
-  useEffect(() => {
+  useLayoutEffect(() => {
     const el = rootRef.current;
     if (!el) return;
 
-    // Guard: pastikan kita di client dan ScrollTrigger tersedia
-    if (typeof window === "undefined" || typeof ScrollTrigger === "undefined") {
-      // nothing to do on server or if plugin missing
-      return;
-    }
+    // extra safety: pastikan plugin ada
+    if (typeof ScrollTrigger === "undefined") return;
 
-    // safe set initial values
-    gsap.set(el, { y: 22, opacity: 0, transformOrigin: "center" });
+    const ctx = gsap.context(() => {
+      // initial state
+      gsap.set(el, {
+        y: 22,
+        opacity: 0,
+        transformOrigin: "center",
+      });
 
-    // create ScrollTrigger for this element
-    const st = ScrollTrigger.create({
-      trigger: el,
-      start: "top 92%",
-      end: "bottom 20%",
-      onEnter: () => {
-        gsap.to(el, {
-          y: 0,
-          opacity: 1,
-          duration: 1.05,
-          ease: "expo.out",
-        });
-      },
-      onLeave: () => {
-        gsap.to(el, {
-          y: 22,
-          opacity: 0,
-          duration: 0.8,
-          ease: "expo.in",
-        });
-      },
-      onEnterBack: () => {
-        gsap.to(el, {
-          y: 0,
-          opacity: 1,
-          duration: 1.05,
-          ease: "expo.out",
-        });
-      },
-      onLeaveBack: () => {
-        gsap.to(el, {
-          y: 22,
-          opacity: 0,
-          duration: 0.8,
-          ease: "expo.in",
-        });
-      },
-    });
+      ScrollTrigger.create({
+        trigger: el,
+        start: "top 92%",
+        end: "bottom 20%",
+        onEnter: () => {
+          gsap.to(el, {
+            y: 0,
+            opacity: 1,
+            duration: 1.05,
+            ease: "expo.out",
+          });
+        },
+        onLeave: () => {
+          gsap.to(el, {
+            y: 22,
+            opacity: 0,
+            duration: 0.8,
+            ease: "expo.in",
+          });
+        },
+        onEnterBack: () => {
+          gsap.to(el, {
+            y: 0,
+            opacity: 1,
+            duration: 1.05,
+            ease: "expo.out",
+          });
+        },
+        onLeaveBack: () => {
+          gsap.to(el, {
+            y: 22,
+            opacity: 0,
+            duration: 0.8,
+            ease: "expo.in",
+          });
+        },
+      });
+    }, el);
 
-    return () => {
-      try {
-        st && st.kill && st.kill();
-      } catch (e) {
-        // ignore cleanup errors
-      }
-    };
+    // 🔥 PENTING: fix refresh saat reload di posisi bawah
+    ScrollTrigger.refresh();
+
+    return () => ctx.revert();
   }, []);
+
 
   /* ------------ Render waveform (ping-pong gradient + 0–previewSeconds) ----------- */
   useEffect(() => {

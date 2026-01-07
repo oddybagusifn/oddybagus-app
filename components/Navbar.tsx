@@ -125,6 +125,10 @@ function IconBurstToggle() {
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState<NavLabel>("BUILDS");
+  const isManualNav = useRef(false);
+
+  const isProgrammaticScroll = useRef(false);
+
 
   const ulRef = useRef<HTMLUListElement | null>(null);
   const liRefs = useRef<Record<NavLabel, HTMLLIElement | null>>({
@@ -149,6 +153,7 @@ export default function Navbar() {
     setIndicatorCenter(center);
   };
 
+
   useEffect(() => {
     if (!open) return;
 
@@ -161,26 +166,39 @@ export default function Navbar() {
   useEffect(() => {
     const obs = new IntersectionObserver(
       (entries) => {
-        const top = entries
+        // 🔒 abaikan observer hanya saat scroll dari klik nav
+        if (isProgrammaticScroll.current) return;
+
+        const visible = entries
           .filter((e) => e.isIntersecting)
           .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-        if (!top) return;
-        const id = (top.target as HTMLElement).id;
+
+        if (!visible) return;
+
+        const id = (visible.target as HTMLElement).id;
         const found = (Object.keys(SECTION_ID) as NavLabel[]).find(
           (k) => SECTION_ID[k] === id
         );
-        if (found && found !== activeRef.current) setActive(found);
+
+        if (found && found !== activeRef.current) {
+          setActive(found);
+          moveIndicatorTo(found);
+        }
       },
-      { threshold: [0.3, 0.6], rootMargin: "-20% 0px -40% 0px" }
+      {
+        threshold: [0.35, 0.6],
+        rootMargin: "-25% 0px -45% 0px",
+      }
     );
 
-    const els = (Object.values(SECTION_ID) as string[])
+    const els = Object.values(SECTION_ID)
       .map((id) => document.getElementById(id))
       .filter(Boolean) as Element[];
 
     els.forEach((e) => obs.observe(e));
     return () => obs.disconnect();
   }, []);
+
 
   useEffect(() => {
     const raf = requestAnimationFrame(() => moveIndicatorTo(active));
@@ -193,18 +211,25 @@ export default function Navbar() {
   }, [active]);
 
   const onClickNav = (label: NavLabel) => {
-    const id = SECTION_ID[label];
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-    if (
-      typeof window !== "undefined" &&
-      window.matchMedia("(max-width: 767px)").matches
-    ) {
-      setOpen(false);
-    }
+    const el = document.getElementById(SECTION_ID[label]);
+    if (!el) return;
+
+    // 🔒 lock observer
+    isProgrammaticScroll.current = true;
+
     setActive(label);
     moveIndicatorTo(label);
+
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+
+    // 🔓 unlock setelah scroll selesai
+    setTimeout(() => {
+      isProgrammaticScroll.current = false;
+    }, 500);
   };
+
+
+
 
   return (
     <nav className="fixed top-0 inset-x-0 z-50 bg-transparent pointer-events-none">
@@ -237,19 +262,20 @@ export default function Navbar() {
                 ref={ulRef}
                 className={`relative flex items-center gap-20 tracking-[0.12em] font-bold
                 transition-all duration-500 ease-[cubic-bezier(.22,1,.36,1)]
-                ${
-                  open
+                ${open
                     ? "opacity-100 translate-x-0 pointer-events-auto"
                     : "opacity-0 translate-x-3 pointer-events-none"
-                }`}
+                  }`}
               >
                 <span
-                  className={`pointer-events-none absolute top-full mt-2 h-[3px] w-8 bg-[#ebebeb]
-                  rounded-full shadow-[0_8px_18px_rgba(0,0,0,0.28)] -translate-x-1/2
-                  transition-[left,opacity] duration-500 ease-[cubic-bezier(.22,1,.36,1)]
-                  ${open ? "opacity-100" : "opacity-0"}`}
+                  className={`pointer-events-none absolute top-full mt-2 h-[3px] w-5
+    rounded-full shadow-[0_8px_18px_rgba(0,0,0,0.28)] -translate-x-1/2
+    transition-[left,opacity] duration-500 ease-[cubic-bezier(.22,1,.36,1)]
+    indicator-gradient
+    ${open ? "opacity-100" : "opacity-0"}`}
                   style={{ left: `${indicatorCenter}px` }}
                 />
+
                 {NAV.map((label, i) => {
                   const isActive = active === label;
                   return (
@@ -258,9 +284,8 @@ export default function Navbar() {
                       ref={(el) => {
                         liRefs.current[label] = el;
                       }}
-                      className={`${
-                        open ? "animate-slide-soft" : ""
-                      } relative select-none`}
+                      className={`${open ? "animate-slide-soft" : ""
+                        } relative select-none`}
                       style={{ animationDelay: `${i * 70}ms` }}
                     >
                       <button
@@ -270,7 +295,7 @@ export default function Navbar() {
                         <span
                           className={
                             isActive
-                              ? "text-[#ebebeb]"
+                              ? "text-gradient-animated"
                               : "text-transparent [-webkit-text-stroke:0.5px_#ebebeb] hover:text-[#ebebeb] transition-colors duration-300"
                           }
                         >
@@ -294,21 +319,19 @@ export default function Navbar() {
               >
                 <span
                   className={`absolute inset-0 grid place-items-center transition-all duration-300
-                ${
-                  open
-                    ? "opacity-0 scale-75 rotate-90"
-                    : "opacity-100 scale-100 rotate-0"
-                }`}
+                ${open
+                      ? "opacity-0 scale-75 rotate-90"
+                      : "opacity-100 scale-100 rotate-0"
+                    }`}
                 >
                   <OutlineGrid9 size={48} strokeWidth={1} />
                 </span>
                 <span
                   className={`absolute inset-0 grid place-items-center transition-all duration-300
-                ${
-                  open
-                    ? "opacity-100 scale-100 rotate-0"
-                    : "opacity-0 -rotate-90 scale-75"
-                }`}
+                ${open
+                      ? "opacity-100 scale-100 rotate-0"
+                      : "opacity-0 -rotate-90 scale-75"
+                    }`}
                 >
                   <X size={48} strokeWidth={1} />
                 </span>
@@ -324,11 +347,10 @@ export default function Navbar() {
   bg-[rgba(230,230,230,0)]
   backdrop-blur-xl supports-[backdrop-filter]:backdrop-blur-xl
   transition-[opacity,transform] duration-500 ease-[cubic-bezier(.22,1,.36,1)]
-  ${
-    open
-      ? "opacity-100 translate-y-0 pointer-events-auto"
-      : "opacity-0 -translate-y-4 pointer-events-none"
-  }`}
+  ${open
+            ? "opacity-100 translate-y-0 pointer-events-auto"
+            : "opacity-0 -translate-y-4 pointer-events-none"
+          }`}
       >
         <div
           className={`${CONTAINER} h-full px-6
@@ -350,8 +372,8 @@ export default function Navbar() {
                     <span
                       className={
                         isActive
-                          ? "text-2xl font-extrabold text-[#ebebeb]"
-                          : "text-2xl font-extrabold text-transparent [-webkit-text-stroke:1px_#ebebeb] hover:text-[#ebebeb] transition-colors duration-300"
+                          ? "text-[28px] font-extrabold text-gradient-animated"
+                          : "text-[28px] font-extrabold text-transparent [-webkit-text-stroke:1px_#ebebeb] hover:text-[#ebebeb] transition-colors duration-300"
                       }
                     >
                       {label}
@@ -365,29 +387,44 @@ export default function Navbar() {
       </div>
 
       <style jsx>{`
-        @keyframes slide-soft {
-          0% {
-            transform: translateX(20px);
-            opacity: 0;
-          }
-          70% {
-            transform: translateX(-1.5px);
-            opacity: 1;
-          }
-          100% {
-            transform: translateX(0);
-          }
-        }
-        .animate-slide-soft {
-          animation: slide-soft 480ms cubic-bezier(0.22, 1, 0.36, 1) both;
-          will-change: transform, opacity;
-        }
-        @media (prefers-reduced-motion: reduce) {
-          .animate-slide-soft {
-            animation: none;
-          }
-        }
-      `}</style>
+  @keyframes gradient-flow {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  /* ✅ TEXT GRADIENT */
+  .text-gradient-animated {
+    background-image: linear-gradient(
+      120deg,
+      #ff6bcb,#54a0ff,#5f27cd,#1dd1a1,#ff9ff3
+    );
+    background-size: 300% 300%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    animation: gradient-flow 4s ease-in-out infinite;
+  }
+
+  /* ✅ UNDERLINE / INDICATOR GRADIENT */
+  .indicator-gradient {
+    background-image: linear-gradient(
+      120deg,
+      #ff6bcb,#54a0ff,#5f27cd,#1dd1a1,#ff9ff3
+    );
+    background-size: 300% 300%;
+    animation: gradient-flow 4s ease-in-out infinite;
+  }
+`}</style>
+
     </nav>
   );
 }
+
+
