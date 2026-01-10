@@ -231,7 +231,7 @@ export default function FloatingMiniPlayer() {
     if (audioEl.paused) {
       const root = audioEl.closest<HTMLElement>(".track-wave-player");
       window.dispatchEvent(new CustomEvent(GLOBAL_PLAY_EVENT, { detail: { id: root?.dataset.trackId } }));
-      audioEl.play().catch(() => {});
+      audioEl.play().catch(() => { });
     } else audioEl.pause();
   };
 
@@ -243,7 +243,7 @@ export default function FloatingMiniPlayer() {
     const a = target?.querySelector<HTMLAudioElement>("audio");
     if (!a) return;
     window.dispatchEvent(new CustomEvent(GLOBAL_PLAY_EVENT, { detail: { id: target.dataset.trackId } }));
-    a.play().catch(() => {});
+    a.play().catch(() => { });
     attachAudio(a, false); // don't reveal animation on sibling play
   };
 
@@ -420,9 +420,9 @@ export default function FloatingMiniPlayer() {
 
               <button ref={playBtnRef} onClick={togglePlay} className="w-9 h-9 flex items-center justify-center rounded-full bg-white text-black shadow">
                 {isPlaying ? (
-                  <svg className="m-1" width="24" height="24" viewBox="0 0 24 24" fill="black"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>
+                  <svg className="m-2" width="32" height="32" viewBox="0 0 24 24" fill="black"><rect x="6" y="5" width="4" height="14" rx="1" /><rect x="14" y="5" width="4" height="14" rx="1" /></svg>
                 ) : (
-                  <svg className="m-1" viewBox="0 0 32 32" aria-hidden><polygon points="11,8 11,24 23,16" fill="black"/></svg>
+                  <svg className="m-2" viewBox="0 0 32 32" aria-hidden><polygon points="11,8 11,24 23,16" fill="black" /></svg>
                 )}
               </button>
 
@@ -492,113 +492,185 @@ export default function FloatingMiniPlayer() {
       </div>
 
       <style jsx>{`
-        /* wrapper and center placement (player centered bottom) */
-        .fm-wrapper {
-          position: fixed;
-          left: 0;
-          right: 0;
-          bottom: 8px;
-          z-index: 60;
-          display: flex;
-          justify-content: center;
-          pointer-events: none;
-        }
+  /* ===============================
+     WRAPPER (TEMBUS KLIK)
+  =============================== */
+  .fm-wrapper {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 8px;
+    z-index: 60;
 
-        .fm-inner {
-          transform-origin: center bottom;
-          pointer-events: auto;
-          display: inline-block;
-          width: min(1000px, calc(100% - 48px));
-          max-width: 100%;
-        }
+    display: flex;
+    justify-content: center;
 
-        /* vertical open/close: smooth translateY with ease-out, no bounce */
-        .fm-inner.opening {
-          animation: fm-open-vertical ${OPEN_CLOSE_MS}ms cubic-bezier(0.2, 0.9, 0.15, 1) both;
-        }
-        .fm-inner.open {
-          transform: translateY(0);
-          opacity: 1;
-          transition: transform 260ms cubic-bezier(0.2,0.9,0.15,1), opacity 200ms ease;
-        }
-        .fm-inner.closing {
-          animation: fm-close-vertical ${OPEN_CLOSE_MS}ms cubic-bezier(0.2, 0.9, 0.15, 1) both;
-        }
+    pointer-events: none;
+  }
 
-        @keyframes fm-open-vertical {
-          0% { transform: translateY(40px); opacity: 0; }
-          100% { transform: translateY(0); opacity: 1; }
-        }
-        @keyframes fm-close-vertical {
-          0% { transform: translateY(0); opacity: 1; }
-          100% { transform: translateY(44px); opacity: 0; }
-        }
+  /* ===============================
+     INNER PLAYER (INTERAKTIF)
+  =============================== */
+  .fm-inner {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
 
-        /* ------------ GRID LAYOUT STYLES (kept) ------------ */
-        .fm-player-grid {
-          display: grid;
-          grid-template-columns: 1.5fr 4fr 1fr;
-          align-items: center;
-          gap: 12px;
-        }
-        .col-left { display:flex; align-items:center; min-width:0; }
-        .col-center { display:flex; flex-direction:column; align-items:center; }
-        .col-right { display:flex; align-items:center; justify-content:flex-start; }
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
 
-        .vol-range { width: 96px; }
-        .desktop-only { display: inline-block; }
+    pointer-events: auto;
+  }
 
-        .vol-popover {
-          position: absolute;
-          right: 0;
-          bottom: 52px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: 44px;
-          padding: 8px;
-          border-radius: 12px;
-          background: rgba(12,12,12,0.95);
-          border: 1px solid rgba(255,255,255,0.06);
-          box-shadow: 0 8px 28px rgba(0,0,0,0.45);
-          z-index: 85;
-          transform-origin: center bottom;
-          animation: pop-in 180ms cubic-bezier(0.2,0.9,0.2,1);
-          pointer-events: auto;
-        }
-        @keyframes pop-in { from { transform: translateY(8px) scale(0.96); opacity: 0 } to { transform: translateY(0) scale(1); opacity: 1 } }
+  /* ===============================
+     HIDE HANDLE (WAJIB EXPLICIT)
+  =============================== */
+  .fm-hide-handle {
+    pointer-events: auto;
+    z-index: 90;
+  }
 
-        .vol-range-vertical {
-          -webkit-appearance: none;
-          appearance: none;
-          width: 120px;
-          height: 8px;
-          transform: rotate(-90deg);
-          transform-origin: center;
-          background: transparent;
-        }
-        .vol-range-vertical::-webkit-slider-runnable-track {
-          height: 8px;
-          background: rgba(255,255,255,0.12);
-          border-radius: 999px;
-        }
-        .vol-range-vertical::-webkit-slider-thumb {
-          -webkit-appearance: none;
-          width: 12px;
-          height: 12px;
-          border-radius: 999px;
-          background: #ebebeb;
-          margin-top: -2px;
-          box-shadow: 0 1px 2px rgba(0,0,0,0.6);
-        }
+  /* ===============================
+     OPEN / CLOSE ANIMATION
+  =============================== */
+  .fm-inner.opening {
+    animation: fm-open-vertical ${OPEN_CLOSE_MS}ms cubic-bezier(0.2, 0.9, 0.15, 1) both;
+  }
 
-        @media (min-width: 641px) { .vol-popover { display: none; } }
-        @media (max-width: 640px) { .desktop-only { display: none; } .vol-btn { display: inline-flex; } }
+  .fm-inner.open {
+    transform: translateY(0);
+    opacity: 1;
+    transition:
+      transform 260ms cubic-bezier(0.2, 0.9, 0.15, 1),
+      opacity 200ms ease;
+  }
 
-        /* ensure we can still interact with UI */
-        .fm-wrapper { pointer-events: none; }
-        .fm-inner, .fm-player-grid, .fm-player-grid * { pointer-events: auto; }
-      `}</style>
+  .fm-inner.closing {
+    animation: fm-close-vertical ${OPEN_CLOSE_MS}ms cubic-bezier(0.2, 0.9, 0.15, 1) both;
+  }
+
+  @keyframes fm-open-vertical {
+    from {
+      transform: translateY(40px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes fm-close-vertical {
+    from {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateY(44px);
+      opacity: 0;
+    }
+  }
+
+  /* ===============================
+     PLAYER GRID
+  =============================== */
+  .fm-player-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 4fr 1fr;
+    align-items: center;
+    gap: 12px;
+
+    margin: 0 12px;
+
+    pointer-events: auto;
+  }
+
+  .col-left {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+  }
+
+  .col-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .col-right {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  /* ===============================
+     VOLUME
+  =============================== */
+  .vol-range {
+    width: 96px;
+  }
+
+  .desktop-only {
+    display: inline-block;
+  }
+
+  .vol-popover {
+    position: absolute;
+    right: 0;
+    bottom: 52px;
+
+    width: 44px;
+    padding: 8px;
+
+    border-radius: 12px;
+    background: rgba(12, 12, 12, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+
+    z-index: 85;
+    pointer-events: auto;
+
+    animation: pop-in 180ms cubic-bezier(0.2, 0.9, 0.2, 1);
+  }
+
+  @keyframes pop-in {
+    from {
+      transform: translateY(8px) scale(0.96);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+  }
+
+  /* ===============================
+     MOBILE
+  =============================== */
+  @media (max-width: 640px) {
+    .fm-wrapper {
+      bottom: 6px;
+    }
+
+    .fm-inner {
+      width: calc(100vw - 16px);
+    }
+
+    .desktop-only {
+      display: none;
+    }
+
+    .vol-btn {
+      display: inline-flex;
+    }
+  }
+
+  @media (min-width: 641px) {
+    .vol-popover {
+      display: none;
+    }
+  }
+`}</style>
     </div>
   );
 }
