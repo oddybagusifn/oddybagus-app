@@ -536,12 +536,22 @@ export default function TrackWavePlayer({
       {/* text + controls */}
       <div className="flex min-w-0 flex-1 flex-col gap-2">
         {/* bar atas: artist/title + genre di kanan */}
-        <div className="flex items-start justify-between gap-4">
+        <div className="flex items-start justify-between gap-2 sm:gap-4">
           <div className="min-w-0">
-            <div className="text-sm uppercase tracking-[0.15em] text-[#888]">
+            <div className="
+  text-[10px] sm:text-[11px] md:text-sm
+  uppercase tracking-[0.18em]
+  text-[#888]
+">
               {track.artist}
             </div>
-            <div className="truncate text-lg font-bold text-[#f5f5f5]">
+            <div className="
+  truncate
+  text-[15px] sm:text-[16px] md:text-lg
+  font-bold
+  text-[#f5f5f5]
+  leading-tight
+">
               {track.title}
             </div>
 
@@ -570,7 +580,21 @@ export default function TrackWavePlayer({
           </div>
 
           {track.genre && (
-            <span className="ml-4 mt-1 inline-flex items-center rounded-full border border-[#444] px-3 py-1 text-[11px] uppercase tracking-[0.15em] text-[#aaa] whitespace-nowrap">
+            <span
+              className="
+    ml-2 sm:ml-4
+    mt-0.5
+    inline-flex items-center
+    rounded-full
+    border border-[#444]
+    px-2 py-[2px]
+    sm:px-3 sm:py-1
+    text-[9px] sm:text-[10px] md:text-[11px]
+    uppercase tracking-[0.18em]
+    text-[#aaa]
+    whitespace-nowrap
+  "
+            >
               {track.genre}
             </span>
           )}

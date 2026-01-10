@@ -214,19 +214,22 @@ export default function Navbar() {
     const el = document.getElementById(SECTION_ID[label]);
     if (!el) return;
 
-    // 🔒 lock observer
     isProgrammaticScroll.current = true;
 
     setActive(label);
     moveIndicatorTo(label);
 
-    el.scrollIntoView({ behavior: "smooth", block: "start" });
+    setOpen(false);
 
-    // 🔓 unlock setelah scroll selesai
+    setTimeout(() => {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 200);
+
     setTimeout(() => {
       isProgrammaticScroll.current = false;
     }, 500);
   };
+
 
 
 

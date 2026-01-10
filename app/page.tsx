@@ -17,6 +17,7 @@ import TiltedCard from "@/components/TiltedCard";
 import { FiSend } from "react-icons/fi";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
+import CaptionArrow from "@/components/CaptionArrow";
 
 const projects = [
   {
@@ -196,16 +197,28 @@ export default function Home() {
           >
             <ScrollReveal
             >
-              Hi, I am Oddy Bagus👋 I build modern, fast, and
+              Hi, I am Oddy Bagus 👋 I build modern, fast, and
               aesthetic websites through fullstack development and thoughtful
               design. I also produce music ♪ blending sound and technology to
               create expressive digital experiences. I help brands and creators
               bring ideas to life through code, design, and sound.
             </ScrollReveal>
 
-            <div className="relative w-full grid place-items-center md:flex md:justify-end">
-              <HeadBustCanvas />
-            </div>
+            <section className="relative">
+              <SlideInOnScroll delay={0.1} distance={300}>
+                <div className="w-full grid place-items-center md:flex md:justify-end">
+                  <HeadBustCanvas />
+                </div>
+
+              {/* Caption – TOP LEFT */}
+              <div className="absolute left-6 top-6 md:left-10 md:top-10">
+                <CaptionArrow />
+              </div>
+              </SlideInOnScroll>
+            </section>
+
+
+
           </div>
         </div>
       </div>
@@ -266,21 +279,36 @@ export default function Home() {
               <a
                 href="https://soundcloud.com/imvierre"
                 target="_blank"
-                className="group relative inline-flex items-center gap-3
-         rounded-full px-6 py-3 bg-[#0c0c0c] text-[#ebebeb] font-medium
-         overflow-hidden transition-all border"
+                className="
+    group relative inline-flex items-center gap-2 sm:gap-3
+    rounded-full
+    px-4 py-2.5
+    sm:px-5 sm:py-3
+    md:px-6 md:py-3.5
+    bg-[#0c0c0c] text-[#ebebeb]
+    text-[13px] sm:text-[14px] md:text-[15px]
+    font-medium
+    overflow-hidden
+    border
+    transition-all
+    hover:scale-[1.02]
+    active:scale-[0.98]
+  "
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
                   fill="currentColor"
-                  className="w-5 h-5"
+                  className="w-4 h-4 sm:w-5 sm:h-5"
                 >
                   <path d="M17.5 10.5c-.7 0-1.3.2-1.8.6-.3-2.8-2.6-5-5.5-5-2.3 0-4.3 1.4-5.1 3.4-.2 0-.4-.1-.6-.1-2 0-3.5 1.7-3.5 3.8S2.5 17 4.5 17h13c1.7 0 3-1.5 3-3.3s-1.3-3.2-3-3.2z" />
                 </svg>
 
-                <span className="relative z-10">
-                  Want to listen to more? Check it out on SoundCloud →
+                <span className="relative z-10 whitespace-nowrap">
+                  Want to listen to more?
+                  <span className="hidden sm:inline">
+                    {" "}Check it out on SoundCloud →
+                  </span>
                 </span>
               </a>
             </div>
@@ -293,7 +321,25 @@ export default function Home() {
       {/* ===== Stack ===== */}
       <section id="stack" className="px-4 sm:px-6 py-16">
         <div className="mx-auto max-w-[1600px]">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
+          <div className="py-10 md:py-14 ">
+            <h1 className="text-[28px] sm:text-[32px] md:text-[44px] 
+               font-extrabold tracking-[.04em] sm:tracking-[.06em] md:tracking-[.08em]
+               break-words">
+              <ScrollFloat
+                animationDuration={1}
+                ease="back.inOut(3)"
+                scrollStart="center bottom+=50%"
+                scrollEnd="bottom bottom-=40%"
+                stagger={0.03}
+              >
+                WHAT I USE?
+              </ScrollFloat>
+            </h1>
+            <p className="mt-2 text-sm sm:text-base text-[#ebebeb]/100 max-w-2xl">
+              Tools and technologies I rely on to build modern digital products.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-stretch">
 
             {/* LEFT — STACK */}
             <div className="w-full flex justify-center md:justify-start">
@@ -301,7 +347,7 @@ export default function Home() {
             </div>
 
             {/* RIGHT — TEXT */}
-            <div className="w-full flex items-start md:items-center justify-center md:justify-start">
+            <div className="w-full flex justify-center md:items-center md:-translate-y-6">
               <div className="max-w-xl text-center md:text-left">
                 <p className="text-md text-[#ebebeb] leading-relaxed">
                   These are the stacks and tools I frequently use to build
@@ -342,7 +388,7 @@ export default function Home() {
                   scrollEnd="bottom bottom-=40%"
                   stagger={0.03}
                 >
-                  CONNECT WITH VIERRE
+                  LET’S TALK
                 </ScrollFloat>
               </h1>
 
@@ -357,7 +403,7 @@ export default function Home() {
         </div>
       </section>
 
-      <Footer/>
+      <Footer />
     </main>
   );
 }

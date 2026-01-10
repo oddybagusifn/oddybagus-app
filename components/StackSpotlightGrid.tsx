@@ -19,6 +19,7 @@ type Skill = {
   slug: string;
   name: string;
   Icon: React.ComponentType<{ size?: number; color?: string }>;
+  url: string;
 };
 
 /**
@@ -35,16 +36,62 @@ const FlStudioIcon: React.FC<{ size?: number }> = ({ size = 56 }) => (
 );
 
 const skills: Skill[] = [
-  { slug: "laravel", name: "Laravel 11/12", Icon: SiLaravel },
-  { slug: "mysql", name: "MySQL", Icon: SiMysql },
-  { slug: "php", name: "PHP", Icon: SiPhp },
-  { slug: "javascript", name: "JavaScript", Icon: SiJavascript },
-  { slug: "rest-api", name: "REST API", Icon: TbApi },
-  { slug: "figma", name: "Figma", Icon: SiFigma },
-  { slug: "unity2d", name: "Unity 2D", Icon: SiUnity },
-  { slug: "git", name: "Git", Icon: SiGit },
-  { slug: "fl-studio", name: "FL Studio 21", Icon: FlStudioIcon },
+  {
+    slug: "laravel",
+    name: "Laravel 11/12",
+    Icon: SiLaravel,
+    url: "https://laravel.com",
+  },
+  {
+    slug: "mysql",
+    name: "MySQL",
+    Icon: SiMysql,
+    url: "https://www.mysql.com",
+  },
+  {
+    slug: "php",
+    name: "PHP",
+    Icon: SiPhp,
+    url: "https://www.php.net",
+  },
+  {
+    slug: "javascript",
+    name: "JavaScript",
+    Icon: SiJavascript,
+    url: "https://developer.mozilla.org/en-US/docs/Web/JavaScript",
+  },
+  {
+    slug: "rest-api",
+    name: "REST API",
+    Icon: TbApi,
+    url: "https://restfulapi.net",
+  },
+  {
+    slug: "figma",
+    name: "Figma",
+    Icon: SiFigma,
+    url: "https://www.figma.com",
+  },
+  {
+    slug: "unity2d",
+    name: "Unity 2D",
+    Icon: SiUnity,
+    url: "https://unity.com",
+  },
+  {
+    slug: "git",
+    name: "Git",
+    Icon: SiGit,
+    url: "https://git-scm.com",
+  },
+  {
+    slug: "fl-studio",
+    name: "FL Studio 21",
+    Icon: FlStudioIcon,
+    url: "https://www.image-line.com",
+  },
 ];
+
 
 export default function StackSpotlightGrid() {
   // handler to update CSS vars for spotlight on wrapper element
@@ -67,8 +114,14 @@ export default function StackSpotlightGrid() {
   return (
     <div className="w-full">
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8">
-        {skills.map(({ slug, name, Icon }) => (
-          <Link key={slug} href={`/stack/${slug}`} className="group block">
+        {skills.map(({ slug, name, Icon, url }) => (
+          <a
+            key={slug}
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group block"
+          >
             <div className="stack-card">
               <div
                 className="spot-wrapper"
@@ -89,8 +142,9 @@ export default function StackSpotlightGrid() {
                 </SpotlightCard>
               </div>
             </div>
-          </Link>
+          </a>
         ))}
+
 
         <style jsx>{`
         .stack-card {
